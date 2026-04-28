@@ -1,0 +1,34 @@
+name: Regenerate Design Bundle
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "govai-design-bundle.md" # prevent infinite loop
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate bundle
+        run: node scripts/generate-bundle.js
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add govai-design-bundle.md
+          git diff --staged --quiet && echo "No changes to bundle" && exit 0
+          git commit -m "chore: regenerate design bundle [skip ci]"
+          git push
