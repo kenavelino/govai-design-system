@@ -1,7 +1,7 @@
 "use client";
 
-import { Icon } from "@/components/ui/icon";
 import Link from "next/link";
+import { Palette, Type, Maximize, Layers } from "lucide-react";
 
 const foundations = [
   {

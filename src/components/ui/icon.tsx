@@ -17,7 +17,7 @@ export interface IconProps {
   className?: string;
   style?: React.CSSProperties;
   "aria-label"?: string;
-  "aria-hidden"?: boolean;
+  "aria-hidden"?: boolean | "true" | "false";
 }
 
 // In-memory cache so we don't refetch SVGs during a session
