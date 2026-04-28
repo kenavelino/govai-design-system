@@ -1,0 +1,6613 @@
+# GovAI Design System — Full Bundle
+
+Generated from `kenavelino/govai-design-system@main`.
+
+This bundle contains everything needed to generate UI consistent with the GovAI Design System.
+Paste this into Google AI Studio System Instructions, or any AI tool's context window.
+
+---
+
+## 1. Design Principles (Design.md)
+
+# GovAI Design System
+
+The GovAI Design System is the unified design language for building consistent, accessible, and scalable AI-native government interfaces across all GovAI products.
+
+This document is the **source of truth for AI coding tools** building UI for GovAI. When generating code, always follow these rules and reference the structured token files (`src/lib/tokens.ts`, `src/app/globals.css`) for exact values.
+
+---
+
+## Mission
+
+Provide a comprehensive, opinionated design language that:
+- Eliminates inconsistency across GovAI Hub, GovGPT, AI Factory, and other government products
+- Makes AI-generated UI feel native to GovAI from the first prompt
+- Bakes in WCAG 2.1 AA accessibility by default
+- Supports light and dark themes, RTL/Arabic locales, and responsive layouts
+
+---
+
+## Core Principles
+
+1. **Tokens are the source of truth.** Never hardcode colors, spacing, radius, or shadows. Always reference design tokens via CSS variables (`var(--color-primary-500)`) or the `tokens.ts` exports.
+2. **Compose, don't reinvent.** New components should be built from the 26 existing primitives (Button, Input, Card, etc.). If a primitive is missing, propose it before authoring a new one-off.
+3. **Accessibility is a hard requirement.** Every interactive element needs keyboard support, focus rings, ARIA labels for icon-only controls, and WCAG-compliant color contrast.
+4. **Light AND dark mode always.** Every surface, text color, and stroke must reference the semantic CSS variables that auto-swap with `next-themes`.
+5. **RTL works out of the box.** Use logical properties when possible (`ms-*`, `me-*` over `ml-*`, `mr-*` for direction-aware spacing).
+6. **Eliminate complexity.** Prefer simple, predictable components over magic. If a feature requires more than 3 props to use correctly, it's too complicated.
+
+---
+
+## Foundations
+
+### Typography
+
+- **Font family:** `Instrument Sans` (Google Fonts), with `system-ui, sans-serif` fallback
+- **Weights used:** `400` regular, `500` medium, `600` semibold (no bold/light)
+- **Scale categories:** `display`, `heading`, `body`, `label` — see `tokens.ts > typography`
+
+| Use case | Token | Size / Line height |
+|---|---|---|
+| Page hero | `display-48` to `display-64` | 48–64 px / 55–74 px |
+| Section heading | `heading-32`, `heading-24` | 32 / 40, 24 / 32 |
+| Sub-heading | `heading-20`, `heading-18` | 20 / 28, 18 / 24 |
+| Body | `body-16`, `body-14` | 16 / 24, 14 / 20 |
+| Caption / label | `label-12` | 12 / 16 |
+
+> **Rule:** Never use arbitrary `text-[xxpx]` Tailwind values that don't map to the token scale.
+
+### Color Tokens
+
+Two layers — **palette** (raw colors) and **semantic** (purpose-based):
+
+#### Palette tokens (`--color-{name}-{step}`)
+- Primary (blue): `50` → `950` — the GovAI brand color (`#2463EB` at 600)
+- Neutral (light): `0` → `950` — for backgrounds, text, strokes
+- Semantic: `success` (green), `error` (red), `warning` (yellow), `info` (cyan)
+- Accent: `purple`, `orange`, `violet`, `indigo`, `teal`
+- Data viz: `data-1` through `data-9` for charts
+
+#### Semantic tokens (auto-swap by theme)
+| Variable | Purpose | Light | Dark |
+|---|---|---|---|
+| `--surface-default` | Default page bg | `#F7F7F7` | `#101010` |
+| `--surface-primary` | Card / panel bg | `#FAFAFA` | `#151515` |
+| `--surface-tertiary` | Subtle bg layers | `#F7F7F7` | `#1C1C1C` |
+| `--surface-alt-tertiary` | Image placeholders | `#EAEAEA` | `#2A2A2A` |
+| `--text-primary` | Primary text | `#0A0A0B` | `#FAFAFA` |
+| `--text-secondary` | Secondary text | `#3B3B3C` | `#BEBEBE` |
+| `--text-tertiary` | Subtle text | `#666666` | `#A8A8A8` |
+| `--header-primary` | Heading color | `#1C1C1E` | `#EDEDED` |
+| `--stroke-primary` | Default border | `#D6D6D6` | `#2A2A2A` |
+| `--icon-brand` | Brand icon color | `#1D58D8` | `#3D78F9` |
+
+> **Rule:** Component code should reference **semantic tokens** for theming (`var(--surface-primary)`), never raw palette values. Use raw palette only for explicit branding accents.
+
+### Spacing — 4px base scale
+
+Allowed values: `0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 56, 64, 80, 96, 120` (all in px).
+
+> **Rule:** Never use Tailwind's default scale (`p-3` = 12 px happens to match, but `p-5` = 20 px and `p-7` does not exist in our system). Always use bracket syntax: `p-[16px]`, `gap-[12px]`. This makes intent explicit and matches Figma values 1:1.
+
+### Corner Radius
+
+| Token | Value | Use |
+|---|---|---|
+| `--radius-2` | 2 px | Tags, status dots |
+| `--radius-4` | 4 px | Inputs, small buttons |
+| `--radius-8` | 8 px | Standard buttons, inputs, badges |
+| `--radius-12` | 12 px | Cards, modals |
+| `--radius-16` | 16 px | Featured cards, hero containers |
+| `--radius-20` | 20 px | Outer wrapper frames (preview boxes) |
+| `--radius-full` | 999 px | Avatars, pills |
+
+### Elevation (shadows)
+
+Six levels via `--shadow-elevation-{1..6}`, all using soft black drop shadows. Use sparingly — flat surfaces with subtle borders are preferred over heavy shadows.
+
+| Level | Use case |
+|---|---|
+| `1` | Resting cards |
+| `2` | Hovered cards |
+| `3` | Dropdowns, popovers |
+| `4` | Modals, dialogs |
+| `5` | Toasts |
+| `6` | Critical alerts |
+
+### Strokes / Borders
+
+- Widths: `1px` default, `2px` for emphasis (focus rings), `4px` only for divider walls
+- Default border color: `var(--stroke-primary)` — auto-swaps for theme
+- Never use raw hex values for borders
+
+### Z-Index Scale
+
+Use the named scale, never magic numbers:
+- `base: 0`
+- `dropdown: 1000`
+- `sticky: 1100`
+- `modal: 1300`
+- `popover: 1400`
+- `tooltip: 1500`
+- `toast: 1600`
+
+### Motion
+
+| Duration | Use |
+|---|---|
+| `instant` 50 ms | Hover state changes |
+| `fast` 100 ms | Toggle/switch state |
+| `normal` 200 ms | Default transitions |
+| `slow` 300 ms | Modal/drawer entry |
+| `slower` 500 ms | Page-level transitions |
+
+| Easing | Use |
+|---|---|
+| `default` (ease-in-out) | Most transitions |
+| `out` (ease-out) | Entry / appearance |
+| `in` (ease-in) | Exit / disappearance |
+| `spring` | Playful interactions, bounces |
+
+> **Rule:** Always include `transition-colors`, `transition-all`, or scoped `transition-transform` on interactive elements. Never instant state changes for hover/focus.
+
+### Breakpoints & Grid
+
+| Breakpoint | Min width | Columns | Gutter | Margin |
+|---|---|---|---|---|
+| Mobile | 360 px | 4 | 16 px | 16 px |
+| Tablet portrait | 768 px | 8 | 20 px | 20 px |
+| Tablet landscape | 1024 px | 12 | 24 px | 24 px |
+| Laptop | 1280 px | 12 | 20 px | 32 px |
+| Desktop | 1440 px | 12 | 24 px | 32 px |
+| Ultrawide | 1920 px | 12 | 32 px | 40 px |
+
+---
+
+## Component Architecture
+
+The system uses **shadcn-pattern components** (Radix UI + Tailwind + class-variance-authority) — but they are **hand-built**, not installed via the shadcn CLI.
+
+### Component conventions
+
+1. **File location:** `src/components/ui/{component-name}.tsx`
+2. **First line:** `"use client";` (all UI components are client-side)
+3. **Variants via CVA:**
+   ```tsx
+   const buttonVariants = cva("base-classes", {
+     variants: {
+       variant: { primary: "...", secondary: "..." },
+       size: { sm: "...", md: "...", lg: "..." }
+     },
+     defaultVariants: { variant: "primary", size: "md" }
+   });
+   ```
+4. **Class composition:** always use `cn(...)` from `@/lib/utils` (combines `clsx` + `tailwind-merge`)
+5. **Forwarded refs:** use `forwardRef` for any component that wraps a native element
+6. **Radix primitives:** prefer Radix-UI primitives (`@radix-ui/react-*`) over building from scratch for accessibility-critical components (Dialog, Tooltip, Tabs, Dropdown, etc.)
+
+### Available Primitives (do not duplicate)
+
+`avatar`, `badge`, `breadcrumb`, `button`, `card`, `checkbox`, `circular-progress`, `data-table`, `date-time-picker`, `dropdown`, `file-uploader`, `icon`, `input`, `number-input`, `pagination`, `progress-bar`, `radio`, `slider`, `stepper`, `tabs`, `textarea`, `toast`, `toggle`, `tooltip`
+
+> Always call `get_component(name)` (via the MCP server) or read the file directly before building — verify the API surface and styles.
+
+---
+
+## Page-Level Layout Conventions
+
+Doc/marketing pages use `ComponentPreview` wrappers from `@/components/docs/component-preview` — a Tabs-based block with a Preview/Code toggle. Use this for any "show example + show code" pattern.
+
+```tsx
+<ComponentPreview heading="Buttons" code={`<Button>Click me</Button>`}>
+  <Button>Click me</Button>
+</ComponentPreview>
+```
+
+For sections like "Usage Guidelines," wrap content in `<DoDont>` from `@/components/docs/do-dont`.
+
+For pages with a right-rail TOC, use `<OnThisPage items={[...]} />` at the top of the page.
+
+For prop documentation tables, use `<PropsTable props={[...]} />`.
+
+---
+
+## Accessibility Requirements
+
+These are non-negotiable:
+
+1. **Keyboard navigation:** every interactive element is reachable with `Tab` and operable with `Enter`/`Space`/arrow keys as appropriate.
+2. **Focus rings:** visible 2-px ring using `--color-primary-500` with 2-px offset, never removed.
+3. **ARIA labels:** all icon-only buttons need `aria-label`. All inputs need `<label>` association.
+4. **Color contrast:** text 4.5:1 vs background, large text 3:1, non-text 3:1 — applies in BOTH light and dark themes.
+5. **Touch targets:** minimum 32 px on hover, recommend 36 px (md) for primary use.
+6. **Screen readers:** decorative icons get `aria-hidden="true"`, meaningful icons get `aria-label`.
+7. **Motion:** respect `prefers-reduced-motion` — long transitions become instant.
+8. **RTL:** test every component in `dir="rtl"` — addons flip, icons mirror, carets sit correctly.
+
+---
+
+## Anti-patterns (DO NOT DO)
+
+- ❌ Hardcoded hex colors in JSX (`#2463EB` instead of `var(--color-primary-600)`)
+- ❌ Custom shadows that don't match the elevation scale
+- ❌ Custom radius values not in the radius scale
+- ❌ `text-base`, `text-lg`, `text-2xl` Tailwind defaults — use bracket-syntax pixel values matching the typography scale
+- ❌ Padding/spacing values not in the 4-px scale
+- ❌ Removing focus rings ("for design reasons")
+- ❌ Building a new component when an existing primitive can compose it
+- ❌ Adding raw `<button>` instead of using the `<Button>` component
+- ❌ Importing `lucide-react` icons when our `<Icon name="..." />` (Phosphor + custom registry) covers it
+
+---
+
+## Working with this design system through AI
+
+When using Claude Code, Cursor, Gemini, ChatGPT, or any other AI tool:
+
+1. **Always reference live source.** The `Design.md`, `tokens.ts`, and component files in this GitHub repo are the source of truth — not memory or training data.
+2. **For Claude Code:** the GovAI MCP server (registered as `govai-design-system`) provides `get_design_principles`, `get_design_tokens`, `get_global_styles`, `list_components`, `get_component(name)`, and `get_design_bundle`. Call these at the start of any UI task.
+3. **For other tools:** paste the raw GitHub URL of `Design.md`, `tokens.ts`, and `globals.css` into the system prompt or context window before generating UI.
+4. **For Gemini AI Studio specifically:** paste the entire bundle (call `get_design_bundle` from Claude Code, or manually concatenate the three files above) into "System instructions" — Gemini's 1M-token context handles it comfortably.
+
+---
+
+## Repository
+
+- **Source:** https://github.com/kenavelino/govai-design-system
+- **Live docs:** https://govai-design-system.kennediavelinowork.workers.dev
+- **Owner:** Kennedi Avelino, DGE
+
+
+---
+
+## 2. Design Tokens (src/lib/tokens.ts)
+
+```ts
+// GovAI Design System - Design Tokens
+// Single source of truth for all design values
+
+export const colors = {
+  primary: {
+    950: "#162B54",
+    900: "#1D408A",
+    800: "#1E4BAF",
+    700: "#1D58D8",
+    600: "#2463EB",
+    500: "#3D78F9",
+    400: "#6190FA",
+    300: "#94B4FD",
+    200: "#BFD3FE",
+    100: "#DBE6FE",
+    50: "#EFF4FF",
+  },
+  purple: {
+    950: "#0D012A",
+    900: "#190544",
+    800: "#34098A",
+    700: "#3C06A1",
+    600: "#500DD6",
+    500: "#6D1EF6",
+    400: "#9F68FF",
+    300: "#BD97FF",
+    200: "#D7C0FF",
+    100: "#DDCCFF",
+    50: "#DDCCFF",
+  },
+  orange: {
+    950: "#541616",
+    900: "#8A351D",
+    800: "#AF401E",
+    700: "#D8491D",
+    600: "#EB5224",
+    500: "#F9693D",
+    400: "#FA8761",
+    300: "#FDAE94",
+    200: "#FECEBF",
+    100: "#FEE3DB",
+    50: "#FFF3EF",
+  },
+  violet: {
+    900: "#331E36",
+    800: "#4D2D51",
+    700: "#673B6B",
+    600: "#804A86",
+    500: "#9A59A1",
+    400: "#AB75B1",
+    300: "#BC90C0",
+    200: "#CDACD0",
+    100: "#DDC8E0",
+    50: "#EEE3EF",
+  },
+  indigo: {
+    900: "#1B263F",
+    800: "#29395F",
+    700: "#374C7E",
+    600: "#445F9E",
+    500: "#4B69AD",
+    400: "#6F8AC8",
+    300: "#8CA1D3",
+    200: "#A9B9DE",
+    100: "#C5D0E9",
+    50: "#E2E8F4",
+  },
+  teal: {
+    900: "#001618",
+    800: "#002124",
+    700: "#002B30",
+    600: "#00363C",
+    500: "#004148",
+    400: "#2B6167",
+    300: "#558085",
+    200: "#80A0A4",
+    100: "#AAC0C2",
+    50: "#D5DFE1",
+  },
+  light: {
+    950: "#0A0A0B",
+    900: "#1C1C1E",
+    800: "#2C2C2E",
+    700: "#3B3B3C",
+    600: "#4A4A4A",
+    500: "#666666",
+    400: "#939393",
+    300: "#CCCCCC",
+    200: "#D6D6D6",
+    100: "#EAEAEA",
+    50: "#F7F7F7",
+    0: "#FAFAFA",
+  },
+  dark: {
+    950: "#FAFAFA",
+    900: "#EDEDED",
+    800: "#D1D1D1",
+    700: "#BEBEBE",
+    600: "#A8A8A8",
+    500: "#757575",
+    400: "#5B5B5B",
+    300: "#464646",
+    200: "#3F3F3F",
+    100: "#2A2A2A",
+    50: "#1C1C1C",
+    0: "#151515",
+  },
+  success: {
+    950: "#011F09",
+    900: "#023212",
+    800: "#17633B",
+    700: "#158C4E",
+    600: "#1EAF62",
+    500: "#21C16B",
+    400: "#3DE089",
+    300: "#84EAB4",
+    200: "#C1F5DA",
+    100: "#D1FBE9",
+    50: "#E0FBEC",
+  },
+  error: {
+    950: "#25070A",
+    900: "#2D0511",
+    800: "#6A1323",
+    700: "#BA2641",
+    600: "#E12D48",
+    500: "#F03F51",
+    400: "#F66B77",
+    300: "#F89FA3",
+    200: "#FBC7CC",
+    100: "#FCE6E8",
+    50: "#FFF4F5",
+  },
+  warning: {
+    950: "#2A1401",
+    900: "#442605",
+    800: "#8A5209",
+    700: "#D9891B",
+    600: "#E7A71A",
+    500: "#F6B51E",
+    400: "#FFD268",
+    300: "#FFE097",
+    200: "#FFECC0",
+    100: "#FFEECC",
+    50: "#FFFAEA",
+  },
+  info: {
+    950: "#01222A",
+    900: "#053444",
+    800: "#09658A",
+    700: "#066BA1",
+    600: "#0D8CD6",
+    500: "#1EA7F6",
+    400: "#68C8FF",
+    300: "#97D9FF",
+    200: "#C0E8FF",
+    100: "#CCEEFF",
+    50: "#EAF7FF",
+  },
+  white: "#FFFFFF",
+  black: "#101010",
+  dataViz: {
+    1: "#4556B5",
+    2: "#3AB2C1",
+    3: "#FF7043",
+    4: "#E54440",
+    5: "#7763CF",
+    6: "#FFC821",
+    7: "#F0739D",
+    8: "#D1DC65",
+    9: "#5BC6F6",
+  },
+} as const;
+
+export const typography = {
+  fontFamily: "'Instrument Sans', sans-serif",
+  display: {
+    64: { size: "64px", lineHeight: "74px", letterSpacing: "-2%" },
+    56: { size: "56px", lineHeight: "64px", letterSpacing: "-2%" },
+    52: { size: "52px", lineHeight: "59px", letterSpacing: "-2%" },
+    48: { size: "48px", lineHeight: "55px", letterSpacing: "-2%" },
+  },
+  heading: {
+    44: { size: "44px", lineHeight: "54px", letterSpacing: "-1%" },
+    40: { size: "40px", lineHeight: "48px", letterSpacing: "-1%" },
+    32: { size: "32px", lineHeight: "40px", letterSpacing: "-0.5%" },
+    24: { size: "24px", lineHeight: "32px", letterSpacing: "0%" },
+    20: { size: "20px", lineHeight: "28px", letterSpacing: "0%" },
+    18: { size: "18px", lineHeight: "24px", letterSpacing: "0%" },
+    16: { size: "16px", lineHeight: "20px", letterSpacing: "0%" },
+  },
+  body: {
+    18: { size: "18px", lineHeight: "28px" },
+    16: { size: "16px", lineHeight: "24px" },
+    14: { size: "14px", lineHeight: "20px" },
+    12: { size: "12px", lineHeight: "16px" },
+  },
+  label: {
+    16: { size: "16px", lineHeight: "24px" },
+    14: { size: "14px", lineHeight: "20px" },
+    12: { size: "12px", lineHeight: "16px" },
+  },
+  weight: {
+    regular: 400,
+    medium: 500,
+    semibold: 600,
+  },
+} as const;
+
+export const spacing = {
+  0: "0px",
+  2: "2px",
+  4: "4px",
+  6: "6px",
+  8: "8px",
+  12: "12px",
+  16: "16px",
+  20: "20px",
+  24: "24px",
+  32: "32px",
+  40: "40px",
+  48: "48px",
+  56: "56px",
+  64: "64px",
+  80: "80px",
+  96: "96px",
+  120: "120px",
+} as const;
+
+export const radius = {
+  0: "0px",
+  2: "2px",
+  4: "4px",
+  8: "8px",
+  12: "12px",
+  16: "16px",
+  20: "20px",
+  full: "999px",
+} as const;
+
+export const elevation = {
+  1: "0 1px 2px 0 rgba(0,0,0,0.08)",
+  2: "0 2px 4px 0 rgba(0,0,0,0.10)",
+  3: "0 4px 8px 0 rgba(0,0,0,0.12)",
+  4: "0 8px 16px 0 rgba(0,0,0,0.14)",
+  5: "0 12px 24px 0 rgba(0,0,0,0.16)",
+  6: "0 16px 32px 0 rgba(0,0,0,0.18)",
+} as const;
+
+export const zIndex = {
+  base: 0,
+  dropdown: 1000,
+  sticky: 1100,
+  modal: 1300,
+  popover: 1400,
+  tooltip: 1500,
+  toast: 1600,
+} as const;
+
+export const motion = {
+  duration: {
+    instant: "50ms",
+    fast: "100ms",
+    normal: "200ms",
+    slow: "300ms",
+    slower: "500ms",
+  },
+  easing: {
+    default: "cubic-bezier(0.4, 0, 0.2, 1)",
+    in: "cubic-bezier(0.4, 0, 1, 1)",
+    out: "cubic-bezier(0, 0, 0.2, 1)",
+    inOut: "cubic-bezier(0.4, 0, 0.2, 1)",
+    spring: "cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+  },
+} as const;
+
+export const breakpoints = {
+  mobile: "360px",
+  tabletPortrait: "768px",
+  tabletLandscape: "1024px",
+  laptop: "1280px",
+  desktop: "1440px",
+  ultrawide: "1920px",
+} as const;
+
+export const grid = {
+  mobile: { columns: 4, gutter: "16px", margin: "16px" },
+  tabletPortrait: { columns: 8, gutter: "20px", margin: "20px" },
+  tabletLandscape: { columns: 12, gutter: "24px", margin: "24px" },
+  laptop: { columns: 12, gutter: "20px", margin: "32px" },
+  desktop: { columns: 12, gutter: "24px", margin: "32px" },
+  ultrawide: { columns: 12, gutter: "32px", margin: "40px" },
+} as const;
+
+```
+
+---
+
+## 3. Global Styles (src/app/globals.css)
+
+```css
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary */
+  --color-primary-950: #162B54;
+  --color-primary-900: #1D408A;
+  --color-primary-800: #1E4BAF;
+  --color-primary-700: #1D58D8;
+  --color-primary-600: #2463EB;
+  --color-primary-500: #3D78F9;
+  --color-primary-400: #6190FA;
+  --color-primary-300: #94B4FD;
+  --color-primary-200: #BFD3FE;
+  --color-primary-100: #DBE6FE;
+  --color-primary-50: #EFF4FF;
+
+  /* Purple */
+  --color-purple-950: #0D012A;
+  --color-purple-900: #190544;
+  --color-purple-800: #34098A;
+  --color-purple-700: #3C06A1;
+  --color-purple-600: #500DD6;
+  --color-purple-500: #6D1EF6;
+  --color-purple-400: #9F68FF;
+  --color-purple-300: #BD97FF;
+  --color-purple-200: #D7C0FF;
+  --color-purple-100: #DDCCFF;
+  --color-purple-50: #DDCCFF;
+
+  /* Orange */
+  --color-orange-950: #541616;
+  --color-orange-900: #8A351D;
+  --color-orange-800: #AF401E;
+  --color-orange-700: #D8491D;
+  --color-orange-600: #EB5224;
+  --color-orange-500: #F9693D;
+  --color-orange-400: #FA8761;
+  --color-orange-300: #FDAE94;
+  --color-orange-200: #FECEBF;
+  --color-orange-100: #FEE3DB;
+  --color-orange-50: #FFF3EF;
+
+  /* Violet */
+  --color-violet-900: #331E36;
+  --color-violet-800: #4D2D51;
+  --color-violet-700: #673B6B;
+  --color-violet-600: #804A86;
+  --color-violet-500: #9A59A1;
+  --color-violet-400: #AB75B1;
+  --color-violet-300: #BC90C0;
+  --color-violet-200: #CDACD0;
+  --color-violet-100: #DDC8E0;
+  --color-violet-50: #EEE3EF;
+
+  /* Indigo */
+  --color-indigo-900: #1B263F;
+  --color-indigo-800: #29395F;
+  --color-indigo-700: #374C7E;
+  --color-indigo-600: #445F9E;
+  --color-indigo-500: #4B69AD;
+  --color-indigo-400: #6F8AC8;
+  --color-indigo-300: #8CA1D3;
+  --color-indigo-200: #A9B9DE;
+  --color-indigo-100: #C5D0E9;
+  --color-indigo-50: #E2E8F4;
+
+  /* Teal */
+  --color-teal-900: #001618;
+  --color-teal-800: #002124;
+  --color-teal-700: #002B30;
+  --color-teal-600: #00363C;
+  --color-teal-500: #004148;
+  --color-teal-400: #2B6167;
+  --color-teal-300: #558085;
+  --color-teal-200: #80A0A4;
+  --color-teal-100: #AAC0C2;
+  --color-teal-50: #D5DFE1;
+
+  /* Neutrals Light */
+  --color-neutral-950: #0A0A0B;
+  --color-neutral-900: #1C1C1E;
+  --color-neutral-800: #2C2C2E;
+  --color-neutral-700: #3B3B3C;
+  --color-neutral-600: #4A4A4A;
+  --color-neutral-500: #666666;
+  --color-neutral-400: #939393;
+  --color-neutral-300: #CCCCCC;
+  --color-neutral-200: #D6D6D6;
+  --color-neutral-100: #EAEAEA;
+  --color-neutral-50: #F7F7F7;
+  --color-neutral-0: #FAFAFA;
+
+  /* Success */
+  --color-success-950: #011F09;
+  --color-success-900: #023212;
+  --color-success-800: #17633B;
+  --color-success-700: #158C4E;
+  --color-success-600: #1EAF62;
+  --color-success-500: #21C16B;
+  --color-success-400: #3DE089;
+  --color-success-300: #84EAB4;
+  --color-success-200: #C1F5DA;
+  --color-success-100: #D1FBE9;
+  --color-success-50: #E0FBEC;
+
+  /* Error */
+  --color-error-950: #25070A;
+  --color-error-900: #2D0511;
+  --color-error-800: #6A1323;
+  --color-error-700: #BA2641;
+  --color-error-600: #E12D48;
+  --color-error-500: #F03F51;
+  --color-error-400: #F66B77;
+  --color-error-300: #F89FA3;
+  --color-error-200: #FBC7CC;
+  --color-error-100: #FCE6E8;
+  --color-error-50: #FFF4F5;
+
+  /* Warning */
+  --color-warning-950: #2A1401;
+  --color-warning-900: #442605;
+  --color-warning-800: #8A5209;
+  --color-warning-700: #D9891B;
+  --color-warning-600: #E7A71A;
+  --color-warning-500: #F6B51E;
+  --color-warning-400: #FFD268;
+  --color-warning-300: #FFE097;
+  --color-warning-200: #FFECC0;
+  --color-warning-100: #FFEECC;
+  --color-warning-50: #FFFAEA;
+
+  /* Info */
+  --color-info-950: #01222A;
+  --color-info-900: #053444;
+  --color-info-800: #09658A;
+  --color-info-700: #066BA1;
+  --color-info-600: #0D8CD6;
+  --color-info-500: #1EA7F6;
+  --color-info-400: #68C8FF;
+  --color-info-300: #97D9FF;
+  --color-info-200: #C0E8FF;
+  --color-info-100: #CCEEFF;
+  --color-info-50: #EAF7FF;
+
+  /* Data Visualization */
+  --color-data-1: #4556B5;
+  --color-data-2: #3AB2C1;
+  --color-data-3: #FF7043;
+  --color-data-4: #E54440;
+  --color-data-5: #7763CF;
+  --color-data-6: #FFC821;
+  --color-data-7: #F0739D;
+  --color-data-8: #D1DC65;
+  --color-data-9: #5BC6F6;
+
+  /* Spacing — 4px base unit */
+  --spacing-0: 0px;
+  --spacing-2: 2px;
+  --spacing-4: 4px;
+  --spacing-6: 6px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-56: 56px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
+  --spacing-120: 120px;
+
+  /* Corner Radius */
+  --radius-0: 0px;
+  --radius-2: 2px;
+  --radius-4: 4px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-full: 999px;
+
+  /* Elevation */
+  --shadow-elevation-1: 0 1px 2px 0 rgba(0,0,0,0.08);
+  --shadow-elevation-2: 0 2px 4px 0 rgba(0,0,0,0.10);
+  --shadow-elevation-3: 0 4px 8px 0 rgba(0,0,0,0.12);
+  --shadow-elevation-4: 0 8px 16px 0 rgba(0,0,0,0.14);
+  --shadow-elevation-5: 0 12px 24px 0 rgba(0,0,0,0.16);
+  --shadow-elevation-6: 0 16px 32px 0 rgba(0,0,0,0.18);
+
+  /* Strokes */
+  --border-1: 1px;
+  --border-2: 2px;
+  --border-4: 4px;
+
+  /* Font */
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+
+  /* Motion — easing curves + durations */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast: 100ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+}
+
+/* Light mode (default) — Semantic Design Palette */
+:root {
+  /* Surface */
+  --surface-default: #F7F7F7;
+  --surface-primary: #FAFAFA;
+  --surface-tertiary: #F7F7F7;
+  --surface-alt-tertiary: #EAEAEA;
+  --surface-disabled: #EAEAEA;
+  --surface-highlight: #EFF4FF;
+  --surface-modal: #FAFAFA;
+
+  /* Text */
+  --text-primary: #0A0A0B;
+  --text-secondary: #3B3B3C;
+  --text-tertiary: #666666;
+  --text-alt-tertiary: #939393;
+  --text-disabled: #D6D6D6;
+  --header-primary: #1C1C1E;
+  --header-secondary: #4A4A4A;
+  --header-disabled: #939393;
+
+  /* Icons */
+  --icon-brand: #1D58D8;
+  --icon-neutral: #1C1C1E;
+  --icon-secondary: #3B3B3C;
+  --icon-tertiary: #666666;
+  --icon-alt-tertiary: #939393;
+  --icon-disabled: #D6D6D6;
+
+  /* Strokes */
+  --stroke-primary: #D6D6D6;
+  --stroke-secondary: #D6D6D6;
+  --stroke-disabled: #D6D6D6;
+
+  /* Code */
+  --code-bg: #F7F7F7;
+  --code-border: #EAEAEA;
+
+  /* Component preview outer frame */
+  --preview-frame-bg: #F2F2F2;
+}
+
+/* Dark mode — Semantic Design Palette */
+.dark {
+  /* Surface */
+  --surface-default: #101010;
+  --surface-primary: #151515;
+  --surface-tertiary: #1C1C1C;
+  --surface-alt-tertiary: #2A2A2A;
+  --surface-disabled: #2A2A2A;
+  --surface-highlight: #162B54;
+  --surface-modal: #0A0A0B;
+
+  /* Text */
+  --text-primary: #FAFAFA;
+  --text-secondary: #BEBEBE;
+  --text-tertiary: #A8A8A8;
+  --text-alt-tertiary: #757575;
+  --text-disabled: #3F3F3F;
+  --header-primary: #EDEDED;
+  --header-secondary: #A8A8A8;
+  --header-disabled: #A8A8A8;
+
+  /* Icons */
+  --icon-brand: #3D78F9;
+  --icon-neutral: #EDEDED;
+  --icon-secondary: #BEBEBE;
+  --icon-tertiary: #757575;
+  --icon-alt-tertiary: #5B5B5B;
+  --icon-disabled: #3F3F3F;
+
+  /* Strokes */
+  --stroke-primary: #2A2A2A;
+  --stroke-secondary: #5B5B5B;
+  --stroke-disabled: #5B5B5B;
+
+  /* Code */
+  --code-bg: #1C1C1C;
+  --code-border: #2A2A2A;
+
+  /* Component preview outer frame */
+  --preview-frame-bg: #2A2A2A;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;               /* Body/16-reg */
+  line-height: 24px;             /* Body/16-reg line-height */
+  color: var(--text-primary);
+  background: var(--surface-default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dashed divider between docs sections — fades at both ends */
+main section[id] {
+  position: relative;
+  padding-top: 32px;
+}
+main section[id]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--stroke-primary);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Horizontal dashed divider with faded ends */
+.divider-dashed-fade {
+  position: relative;
+}
+.divider-dashed-fade::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--stroke-primary);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Tab content fade-in (used by Radix Tabs) */
+@keyframes tab-content-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+[data-slot="tabs-content"][data-state="active"],
+.tab-content-fade[data-state="active"] {
+  animation: tab-content-in 200ms var(--ease-out) both;
+}
+
+/* Progress bar — indeterminate sliding animation */
+@keyframes progress-indeterminate {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(400%); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hide sidebar scrollbar */
+.sidebar-no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.sidebar-no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Scroll fade — solid-color gradient overlays at top/bottom based on scroll position.
+   Uses sticky-positioned pseudo-elements so the fade stays pinned to the scroll viewport
+   while content scrolls beneath. Color matches --surface-default (= neutral-50 in light mode). */
+.scroll-fade-y {
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+}
+
+.scroll-fade-y::before,
+.scroll-fade-y::after {
+  content: "";
+  position: sticky;
+  left: 0;
+  right: 0;
+  display: block;
+  pointer-events: none;
+  z-index: 10;
+  transition: height 200ms var(--ease-out);
+}
+
+.scroll-fade-y::before {
+  top: 0;
+  height: var(--fade-top);
+  margin-bottom: calc(var(--fade-top) * -1);
+  background: linear-gradient(to bottom, var(--surface-default), transparent);
+}
+
+.scroll-fade-y::after {
+  bottom: 0;
+  height: var(--fade-bottom);
+  margin-top: calc(var(--fade-bottom) * -1);
+  background: linear-gradient(to top, var(--surface-default), transparent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-alt-tertiary);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Code blocks — radius/12, spacing/20, Body/14-reg */
+pre {
+  background: var(--code-bg) !important;
+  border: var(--border-1) solid var(--code-border);
+  border-radius: var(--radius-12);
+  padding: var(--spacing-20);
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+code {
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+  font-size: 14px;
+}
+
+/* Inline code — radius/4, spacing/2 horizontal spacing/6 */
+:not(pre) > code {
+  background: var(--code-bg);
+  border: var(--border-1) solid var(--code-border);
+  border-radius: var(--radius-4);
+  padding: var(--spacing-2) var(--spacing-6);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-primary-700);
+}
+
+.dark :not(pre) > code {
+  color: var(--color-primary-400);
+}
+
+```
+
+---
+
+## 4. UI Components (src/components/ui/)
+
+
+### avatar.tsx
+
+```tsx
+"use client";
+
+import { forwardRef } from "react";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+
+const avatarVariants = cva(
+  "relative flex shrink-0 items-center justify-center overflow-hidden rounded-[999px] font-semibold",
+  {
+    variants: {
+      size: {
+        sm: "h-[32px] w-[32px] text-[12px] leading-[16px]",
+        md: "h-[40px] w-[40px] text-[14px] leading-[20px]",
+        lg: "h-[48px] w-[48px] text-[16px] leading-[24px]",
+      },
+      variant: {
+        default: "bg-[var(--surface-alt-tertiary)] text-[var(--text-secondary)]",
+        brand:
+          "bg-[var(--color-primary-100)] text-[var(--color-primary-700)] dark:bg-[var(--color-primary-950)] dark:text-[var(--color-primary-400)]",
+      },
+    },
+    defaultVariants: {
+      size: "md",
+      variant: "default",
+    },
+  }
+);
+
+export interface AvatarProps
+  extends React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>,
+    VariantProps<typeof avatarVariants> {
+  src?: string;
+  alt?: string;
+  initials?: string;
+}
+
+const Avatar = forwardRef<React.ComponentRef<typeof AvatarPrimitive.Root>, AvatarProps>(
+  ({ className, size, variant, src, alt, initials, ...props }, ref) => (
+    <AvatarPrimitive.Root
+      ref={ref}
+      className={cn(avatarVariants({ size, variant }), className)}
+      {...props}
+    >
+      {src && (
+        <AvatarPrimitive.Image
+          src={src}
+          alt={alt || ""}
+          className="aspect-square h-full w-full object-cover"
+        />
+      )}
+      <AvatarPrimitive.Fallback className="flex h-full w-full items-center justify-center">
+        {initials}
+      </AvatarPrimitive.Fallback>
+    </AvatarPrimitive.Root>
+  )
+);
+Avatar.displayName = "Avatar";
+
+export { Avatar, avatarVariants };
+
+```
+
+
+### badge.tsx
+
+```tsx
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+
+const badgeVariants = cva(
+  "inline-flex items-center gap-[6px] rounded-[999px] px-[8px] py-[2px] text-[12px] font-semibold leading-[16px] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-primary-500)] focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        neutral:
+          "bg-[var(--surface-alt-tertiary)] text-[var(--text-secondary)]",
+        brand:
+          "bg-[var(--color-primary-100)] text-[var(--color-primary-700)] dark:bg-[var(--color-primary-950)] dark:text-[var(--color-primary-400)]",
+        success:
+          "bg-[var(--color-success-100)] text-[var(--color-success-800)] dark:bg-[var(--color-success-950)] dark:text-[var(--color-success-200)]",
+        error:
+          "bg-[var(--color-error-100)] text-[var(--color-error-800)] dark:bg-[var(--color-error-950)] dark:text-[var(--color-error-200)]",
+        warning:
+          "bg-[var(--color-warning-100)] text-[var(--color-warning-800)] dark:bg-[var(--color-warning-950)] dark:text-[var(--color-warning-200)]",
+        info:
+          "bg-[var(--color-info-100)] text-[var(--color-info-800)] dark:bg-[var(--color-info-950)] dark:text-[var(--color-info-200)]",
+      },
+    },
+    defaultVariants: {
+      variant: "neutral",
+    },
+  }
+);
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLSpanElement>,
+    VariantProps<typeof badgeVariants> {
+  dot?: boolean;
+}
+
+function Badge({ className, variant, dot, children, ...props }: BadgeProps) {
+  return (
+    <span className={cn(badgeVariants({ variant }), className)} {...props}>
+      {dot && (
+        <span className="h-[6px] w-[6px] rounded-[999px] bg-current" />
+      )}
+      {children}
+    </span>
+  );
+}
+Badge.displayName = "Badge";
+
+export { Badge, badgeVariants };
+
+```
+
+
+### breadcrumb.tsx
+
+```tsx
+"use client";
+
+import { forwardRef } from "react";
+import { Icon } from "@/components/ui/icon";
+import { cn } from "@/lib/utils";
+
+type BreadcrumbSize = "sm" | "md";
+
+export interface BreadcrumbItemData {
+  label: React.ReactNode;
+  href?: string;
+  icon?: boolean;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
+}
+
+export interface BreadcrumbProps
+  extends Omit<React.HTMLAttributes<HTMLElement>, "children"> {
+  items: BreadcrumbItemData[];
+  size?: BreadcrumbSize;
+  separator?: React.ReactNode;
+}
+
+const SIZE_CLASS: Record<BreadcrumbSize, string> = {
+  sm: "text-[12px] leading-[16px]",
+  md: "text-[16px] leading-[24px]",
+};
+
+const ICON_SIZE_CLASS: Record<BreadcrumbSize, string> = {
+  sm: "h-[16px] w-[16px]",
+  md: "h-[20px] w-[20px]",
+};
+
+const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
+  (
+    { items, size = "sm", separator = "/", className, ...props },
+    ref
+  ) => {
+    return (
+      <nav
+        ref={ref}
+        aria-label="Breadcrumb"
+        className={cn("relative flex", className)}
+        {...props}
+      >
+        <ol className="flex items-center gap-[4px]">
+          {items.map((item, index) => {
+            const isLast = index === items.length - 1;
+            const content = (
+              <span className="flex items-center gap-[4px]">
+                {item.icon && (
+                  <Icon
+                    name="house"
+                    weight="regular"
+                    className={cn(
+                      ICON_SIZE_CLASS[size],
+                      isLast
+                        ? "text-[var(--header-primary)]"
+                        : "text-[var(--text-tertiary)]"
+                    )}
+                    aria-hidden
+                  />
+                )}
+                {item.label && <span>{item.label}</span>}
+              </span>
+            );
+
+            return (
+              <li
+                key={index}
+                className="flex items-center gap-[4px]"
+              >
+                {isLast || !item.href ? (
+                  <span
+                    aria-current={isLast ? "page" : undefined}
+                    className={cn(
+                      SIZE_CLASS[size],
+                      "font-normal",
+                      isLast
+                        ? "text-[var(--header-primary)]"
+                        : "text-[var(--text-tertiary)]"
+                    )}
+                  >
+                    {content}
+                  </span>
+                ) : (
+                  <a
+                    href={item.href}
+                    onClick={item.onClick}
+                    className={cn(
+                      SIZE_CLASS[size],
+                      "rounded-[2px] font-normal text-[var(--text-tertiary)] transition-colors",
+                      "hover:text-[var(--header-primary)]",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2"
+                    )}
+                  >
+                    {content}
+                  </a>
+                )}
+                {!isLast && (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      SIZE_CLASS[size],
+                      "select-none text-[var(--text-tertiary)]"
+                    )}
+                  >
+                    {separator}
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      </nav>
+    );
+  }
+);
+Breadcrumb.displayName = "Breadcrumb";
+
+export { Breadcrumb };
+
+```
+
+
+### button.tsx
+
+```tsx
+"use client";
+
+import { Icon } from "@/components/ui/icon";
+import { forwardRef } from "react";
+import { Slot } from "@radix-ui/react-slot";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "@/lib/utils";
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center rounded-[8px] font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2 disabled:pointer-events-none",
+  {
+    variants: {
+      variant: {
+        primary:
+          "bg-[var(--color-primary-600)] text-[var(--color-neutral-0)] hover:bg-[var(--color-primary-700)] active:bg-[var(--color-primary-600)] disabled:bg-[var(--surface-disabled)] disabled:text-[var(--text-alt-tertiary)] dark:hover:bg-[var(--color-primary-500)]",
+        secondary:
+          "border border-[var(--color-primary-600)] text-[var(--color-primary-700)] hover:bg-[var(--color-primary-50)] hover:border-[var(--color-primary-700)] active:bg-[var(--color-primary-100)] disabled:border-[var(--stroke-primary)] disabled:text-[var(--text-alt-tertiary)] disabled:bg-transparent dark:text-[var(--color-primary-500)] dark:hover:bg-[var(--color-primary-950)] dark:hover:border-[var(--color-primary-500)] dark:active:bg-[var(--color-primary-900)]",
+        tertiary:
+          "text-[var(--color-primary-700)] hover:bg-[var(--surface-tertiary)] active:bg-[var(--surface-alt-tertiary)] disabled:text-[var(--text-alt-tertiary)] dark:text-[var(--color-primary-500)]",
+        ghost:
+          "text-[var(--text-secondary)] hover:bg-[var(--surface-tertiary)] active:bg-[var(--surface-alt-tertiary)] disabled:text-[var(--text-alt-tertiary)]",
+        error:
+          "bg-[var(--color-error-600)] text-[var(--color-neutral-0)] hover:bg-[var(--color-error-700)] active:bg-[var(--color-error-600)] disabled:bg-[var(--surface-disabled)] disabled:text-[var(--text-alt-tertiary)]",
+        "error-secondary":
+          "border border-[var(--color-error-600)] text-[var(--color-error-700)] hover:bg-[var(--color-error-50)] disabled:border-[var(--stroke-primary)] disabled:text-[var(--text-alt-tertiary)]",
+      },
+      size: {
+        sm: "h-[32px] px-[12px] gap-[6px] text-[12px] leading-[16px]",
+        md: "h-[36px] px-[12px] gap-[8px] text-[14px] leading-[20px]",
+        lg: "h-[40px] px-[16px] gap-[8px] text-[14px] leading-[20px]",
+        xl: "h-[48px] px-[16px] gap-[8px] text-[16px] leading-[24px]",
+      },
+    },
+    defaultVariants: {
+      variant: "primary",
+      size: "md",
+    },
+  }
+);
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean;
+  loading?: boolean;
+}
+
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, loading, children, disabled, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button";
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        disabled={disabled || loading}
+        {...props}
+      >
+        {loading && <Icon name="circle-notch" className="h-[16px] w-[16px] animate-spin" />}
+        {children}
+      </Comp>
+    );
+  }
+);
+Button.displayName = "Button";
+
+export { Button, buttonVariants };
+
+```
+
+
+### card.tsx
+
+```tsx
+import { forwardRef } from "react";
+import { cn } from "@/lib/utils";
+
+const Card = forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & { interactive?: boolean }
+>(({ className, interactive, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-[16px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] p-[24px]",
+      interactive &&
+        "cursor-pointer transition-all duration-200 hover:border-[var(--stroke-secondary)] hover:shadow-[var(--shadow-elevation-3)]",
+      className
+    )}
+    {...props}
+  />
+));
+Card.displayName = "Card";
+
+const CardHeader = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("mb-[16px]", className)} {...props} />
+  )
+);
+CardHeader.displayName = "CardHeader";
+
+const CardTitle = forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3
+      ref={ref}
+      className={cn(
+        "text-[18px] font-medium leading-[28px] text-[var(--header-primary)]",
+        className
+      )}
+      {...props}
+    />
+  )
+);
+CardTitle.displayName = "CardTitle";
+
+const CardDescription = forwardRef<HTMLParagraphElement, React.HTMLAttributes<HTMLParagraphElement>>(
+  ({ className, ...props }, ref) => (
+    <p
+      ref={ref}
+      className={cn(
+        "mt-[4px] text-[14px] leading-[20px] text-[var(--text-tertiary)]",
+        className
+      )}
+      {...props}
+    />
+  )
+);
+CardDescription.displayName = "CardDescription";
+
+const CardContent = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("", className)} {...props} />
+  )
+);
+CardContent.displayName = "CardContent";
+
+const CardFooter = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div ref={ref} className={cn("flex items-center", className)} {...props} />
+  )
+);
+CardFooter.displayName = "CardFooter";
+
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };
+
+```
+
+
+### checkbox.tsx
+
+```tsx
+"use client";
+
+import { forwardRef, useId, type ReactNode } from "react";
+import { Icon } from "@/components/ui/icon";
+import { cn } from "@/lib/utils";
+
+export type CheckboxSize = "sm" | "md";
+
+export interface CheckboxProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "type" | "checked" | "defaultChecked" | "onChange"> {
+  checked?: boolean;
+  defaultChecked?: boolean;
+  indeterminate?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  size?: CheckboxSize;
+  label?: ReactNode;
+  description?: ReactNode;
+  disabled?: boolean;
+}
+
+const BOX_SIZE: Record<CheckboxSize, string> = {
+  sm: "h-[16px] w-[16px]",
+  md: "h-[20px] w-[20px]",
+};
+
+const ICON_SIZE: Record<CheckboxSize, string> = {
+  sm: "h-[10px] w-[10px]",
+  md: "h-[12px] w-[12px]",
+};
+
+const LABEL_TEXT: Record<CheckboxSize, string> = {
+  sm: "text-[14px] leading-[20px]",
+  md: "text-[16px] leading-[24px]",
+};
+
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
+  {
+    checked,
+    defaultChecked,
+    indeterminate = false,
+    onCheckedChange,
+    size = "md",
+    label,
+    description,
+    disabled = false,
+    className,
+    id,
+    ...rest
+  },
+  ref,
+) {
+  const autoId = useId();
+  const inputId = id || autoId;
+  const isControlled = checked !== undefined;
+  const isChecked = isControlled ? checked : undefined;
+
+  const control = (
+    <span
+      className={cn(
+        "relative inline-flex shrink-0 items-center justify-center rounded-[4px] border transition-colors",
+        BOX_SIZE[size],
+        disabled
+          ? "border-[var(--stroke-primary)] bg-[var(--surface-disabled)]"
+          : (isChecked || indeterminate)
+            ? "border-[var(--color-primary-600)] bg-[var(--color-primary-600)]"
+            : "border-[var(--stroke-primary)] bg-[var(--surface-default)] group-hover:border-[var(--color-primary-600)]",
+        !disabled && "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-primary-500)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--surface-default)]",
+      )}
+      aria-hidden="true"
+    >
+      {indeterminate ? (
+        <Icon
+          name="minus"
+          weight="bold"
+          className={cn(ICON_SIZE[size], disabled ? "text-[var(--text-alt-tertiary)]" : "text-white")}
+        />
+      ) : isChecked ? (
+        <Icon
+          name="check"
+          weight="bold"
+          className={cn(ICON_SIZE[size], disabled ? "text-[var(--text-alt-tertiary)]" : "text-white")}
+        />
+      ) : null}
+    </span>
+  );
+
+  return (
+    <label
+      htmlFor={inputId}
+      className={cn(
+        "group inline-flex items-start gap-[8px]",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
+        className,
+      )}
+    >
+      <input
+        ref={ref}
+        id={inputId}
+        type="checkbox"
+        checked={isControlled ? !!isChecked : undefined}
+        defaultChecked={!isControlled ? defaultChecked : undefined}
+        disabled={disabled}
+        onChange={(e) => onCheckedChange?.(e.target.checked)}
+        className="peer sr-only"
+        aria-checked={indeterminate ? "mixed" : undefined}
+        {...rest}
+      />
+      {control}
+      {(label || description) && (
+        <span className="flex min-w-0 flex-col gap-[2px]">
+          {label && (
+            <span
+              className={cn(
+                "font-medium",
+                LABEL_TEXT[size],
+                disabled ? "text-[var(--text-alt-tertiary)]" : "text-[var(--header-primary)]",
+              )}
+            >
+              {label}
+            </span>
+          )}
+          {description && (
+            <span
+              className={cn(
+                "text-[14px] font-normal leading-[20px]",
+                disabled ? "text-[var(--text-alt-tertiary)]" : "text-[var(--text-secondary)]",
+              )}
+            >
+              {description}
+            </span>
+          )}
+        </span>
+      )}
+    </label>
+  );
+});
+
+```
+
+
+### circular-progress.tsx
+
+```tsx
+"use client";
+
+import { cn } from "@/lib/utils";
+
+export type CircularProgressSize = "sm" | "md" | "lg";
+export type CircularProgressShape = "circle" | "half";
+
+export interface CircularProgressProps {
+  value?: number;
+  size?: CircularProgressSize;
+  shape?: CircularProgressShape;
+  label?: string;
+  showValue?: boolean;
+  indeterminate?: boolean;
+  className?: string;
+  "aria-label"?: string;
+}
+
+// Figma-derived sizes: sm=80px, md=120px, lg=160px
+const DIMS: Record<CircularProgressSize, { outer: number; stroke: number; valueFontSize: number; labelFontSize: number }> = {
+  sm: { outer: 80,  stroke: 6,  valueFontSize: 16, labelFontSize: 10 },
+  md: { outer: 120, stroke: 8,  valueFontSize: 24, labelFontSize: 12 },
+  lg: { outer: 160, stroke: 10, valueFontSize: 32, labelFontSize: 14 },
+};
+
+export function CircularProgress({
+  value = 0,
+  size = "md",
+  shape = "circle",
+  label,
+  showValue = true,
+  indeterminate = false,
+  className,
+  "aria-label": ariaLabel = "Progress",
+}: CircularProgressProps) {
+  const { outer, stroke, valueFontSize, labelFontSize } = DIMS[size];
+  const cx = outer / 2;
+  const cy = outer / 2;
+  // 1px inner padding so the stroke doesn't clip
+  const r = (outer - stroke) / 2 - 1;
+  const clamped = Math.min(100, Math.max(0, value));
+
+  const fullCirc = 2 * Math.PI * r;
+  const halfCirc = Math.PI * r;
+
+  // ─── Full circle ───────────────────────────────────────────────
+  if (shape === "circle") {
+    return (
+      <div
+        role="progressbar"
+        aria-valuenow={indeterminate ? undefined : clamped}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={ariaLabel}
+        aria-busy={indeterminate}
+        className={cn("relative inline-flex items-center justify-center", className)}
+        style={{ width: outer, height: outer }}
+      >
+        <svg
+          width={outer}
+          height={outer}
+          viewBox={`0 0 ${outer} ${outer}`}
+          className={cn(indeterminate && "animate-[spin_1.4s_linear_infinite]")}
+          style={{ transformOrigin: "center" }}
+        >
+          {/* Track */}
+          <circle
+            cx={cx} cy={cy} r={r}
+            fill="none"
+            strokeWidth={stroke}
+            className="stroke-[var(--surface-alt-tertiary)]"
+          />
+          {/* Arc */}
+          <circle
+            cx={cx} cy={cy} r={r}
+            fill="none"
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            className="stroke-[var(--color-primary-600)]"
+            transform={`rotate(-90 ${cx} ${cy})`}
+            style={
+              indeterminate
+                ? { strokeDasharray: `${fullCirc * 0.75} ${fullCirc * 0.25}` }
+                : {
+                    strokeDasharray: fullCirc,
+                    strokeDashoffset: fullCirc * (1 - clamped / 100),
+                    transition: "stroke-dashoffset 300ms var(--ease-out)",
+                  }
+            }
+          />
+        </svg>
+
+        {/* Centre label — not rotated */}
+        {showValue && !indeterminate && (
+          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+            {label && (
+              <span
+                className="mb-[4px] font-normal text-[var(--text-tertiary)]"
+                style={{ fontSize: labelFontSize }}
+              >
+                {label}
+              </span>
+            )}
+            <span
+              className="font-medium leading-none text-[var(--header-primary)]"
+              style={{ fontSize: valueFontSize }}
+            >
+              {Math.round(clamped)}%
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ─── Half circle ───────────────────────────────────────────────
+  // Arc from left (cx-r, cy) clockwise through the top to right (cx+r, cy)
+  const svgH = cy + stroke / 2 + 2;
+  const arc = `M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`;
+
+  // Text lives INSIDE the arc — value's baseline sits at the flat edge,
+  // label stacked above. Matches Figma node 314-8821.
+  const labelGap = 4;
+  const valueBaselineY = cy - Math.max(2, Math.round(stroke / 2));
+  const labelBaselineY = valueBaselineY - valueFontSize - labelGap;
+
+  return (
+    <div
+      role="progressbar"
+      aria-valuenow={indeterminate ? undefined : clamped}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={ariaLabel}
+      className={cn("inline-flex flex-col items-center", className)}
+    >
+      <svg
+        width={outer}
+        height={svgH}
+        viewBox={`0 0 ${outer} ${svgH}`}
+        style={{ overflow: "visible" }}
+      >
+        {/* Track */}
+        <path
+          d={arc}
+          fill="none"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          className="stroke-[var(--surface-alt-tertiary)]"
+        />
+        {/* Arc */}
+        <path
+          d={arc}
+          fill="none"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          className="stroke-[var(--color-primary-600)]"
+          style={{
+            strokeDasharray: halfCirc,
+            strokeDashoffset: halfCirc * (1 - clamped / 100),
+            transition: "stroke-dashoffset 300ms var(--ease-out)",
+          }}
+        />
+        {/* Value text anchored to arc's flat baseline */}
+        {showValue && (
+          <text
+            x={cx}
+            y={valueBaselineY}
+            textAnchor="middle"
+            style={{ fontSize: valueFontSize, fontWeight: 500, fill: "var(--header-primary)", fontFamily: "inherit" }}
+          >
+            {Math.round(clamped)}%
+          </text>
+        )}
+      </svg>
+    </div>
+  );
+}
+
+```
+
+
+### data-table.tsx
+
+```tsx
+"use client";
+
+import { useState, useCallback } from "react";
+import { cn } from "@/lib/utils";
+
+export type SortDirection = "asc" | "desc" | "none";
+
+export interface ColumnDef<T> {
+  key: string;
+  header: string;
+  sortable?: boolean;
+  width?: string;
+  align?: "left" | "right" | "center";
+  render?: (value: unknown, row: T) => React.ReactNode;
+}
+
+export interface DataTableProps<T extends Record<string, unknown>> {
+  columns: ColumnDef<T>[];
+  data: T[];
+  selectable?: boolean;
+  striped?: boolean;
+  stickyHeader?: boolean;
+  headerSize?: "sm" | "lg";
+  onSelectionChange?: (selectedRows: T[]) => void;
+  emptyState?: React.ReactNode;
+  className?: string;
+  getRowKey?: (row: T, index: number) => string | number;
+  isRowDisabled?: (row: T) => boolean;
+}
+
+function SortIcon({ direction }: { direction: SortDirection }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      fill="none"
+      className="ml-[4px] h-[14px] w-[14px] shrink-0"
+      aria-hidden
+    >
+      <path
+        d="M8 3.5L5.5 6.5H10.5L8 3.5Z"
+        fill={direction === "asc" ? "var(--color-primary-600)" : "var(--color-neutral-400)"}
+      />
+      <path
+        d="M8 12.5L10.5 9.5H5.5L8 12.5Z"
+        fill={direction === "desc" ? "var(--color-primary-600)" : "var(--color-neutral-400)"}
+      />
+    </svg>
+  );
+}
+
+function TableCheckbox({
+  checked,
+  indeterminate,
+  disabled,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  indeterminate?: boolean;
+  disabled?: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+}) {
+  return (
+    <label className={cn("inline-flex cursor-pointer items-center", disabled && "cursor-not-allowed")}>
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+        className="peer sr-only"
+        aria-label={label}
+        ref={(el) => {
+          if (el) el.indeterminate = !!indeterminate;
+        }}
+      />
+      <span
+        aria-hidden
+        className={cn(
+          "relative flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-[4px] border transition-colors",
+          disabled
+            ? "border-[var(--stroke-primary)] bg-[var(--surface-disabled)]"
+            : checked || indeterminate
+            ? "border-[var(--color-primary-600)] bg-[var(--color-primary-600)]"
+            : "border-[var(--color-neutral-300)] bg-white hover:border-[var(--color-primary-600)]",
+        )}
+      >
+        {indeterminate && !checked ? (
+          <svg viewBox="0 0 10 10" className="h-[10px] w-[10px]" aria-hidden>
+            <path d="M2 5h6" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
+        ) : checked ? (
+          <svg viewBox="0 0 10 10" className="h-[10px] w-[10px]" aria-hidden>
+            <path
+              d="M1.5 5l2.5 2.5 4.5-5"
+              stroke="white"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ) : null}
+      </span>
+    </label>
+  );
+}
+
+export function DataTable<T extends Record<string, unknown>>({
+  columns,
+  data,
+  selectable = false,
+  striped = false,
+  stickyHeader = false,
+  headerSize = "sm",
+  onSelectionChange,
+  emptyState,
+  className,
+  getRowKey = (_, i) => i,
+  isRowDisabled,
+}: DataTableProps<T>) {
+  const [sortKey, setSortKey] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>("none");
+  const [selectedKeys, setSelectedKeys] = useState<Set<string | number>>(new Set());
+
+  const handleSort = useCallback(
+    (key: string) => {
+      if (sortKey === key) {
+        setSortDirection((d) => (d === "asc" ? "desc" : d === "desc" ? "none" : "asc"));
+        if (sortDirection === "desc") setSortKey(null);
+      } else {
+        setSortKey(key);
+        setSortDirection("asc");
+      }
+    },
+    [sortKey, sortDirection],
+  );
+
+  const sortedData = [...data].sort((a, b) => {
+    if (!sortKey || sortDirection === "none") return 0;
+    const aVal = a[sortKey];
+    const bVal = b[sortKey];
+    const cmp = String(aVal ?? "").localeCompare(String(bVal ?? ""), undefined, { numeric: true });
+    return sortDirection === "asc" ? cmp : -cmp;
+  });
+
+  const allKeys = sortedData.map((row, i) => getRowKey(row, i));
+  const enabledKeys = sortedData
+    .map((row, i) => ({ key: getRowKey(row, i), disabled: isRowDisabled?.(row) }))
+    .filter((r) => !r.disabled)
+    .map((r) => r.key);
+
+  const allSelected = enabledKeys.length > 0 && enabledKeys.every((k) => selectedKeys.has(k));
+  const someSelected = enabledKeys.some((k) => selectedKeys.has(k));
+
+  const handleSelectAll = useCallback(
+    (checked: boolean) => {
+      const next = new Set(selectedKeys);
+      if (checked) {
+        enabledKeys.forEach((k) => next.add(k));
+      } else {
+        enabledKeys.forEach((k) => next.delete(k));
+      }
+      setSelectedKeys(next);
+      onSelectionChange?.(
+        sortedData.filter((row, i) => next.has(getRowKey(row, i))),
+      );
+    },
+    [enabledKeys, selectedKeys, sortedData, getRowKey, onSelectionChange],
+  );
+
+  const handleSelectRow = useCallback(
+    (key: string | number, checked: boolean) => {
+      const next = new Set(selectedKeys);
+      if (checked) next.add(key);
+      else next.delete(key);
+      setSelectedKeys(next);
+      onSelectionChange?.(
+        sortedData.filter((row, i) => next.has(getRowKey(row, i))),
+      );
+    },
+    [selectedKeys, sortedData, getRowKey, onSelectionChange],
+  );
+
+  const headerHeight = headerSize === "lg" ? "h-[56px]" : "h-[40px]";
+
+  return (
+    <div className={cn("w-full overflow-hidden rounded-[8px] border border-[var(--stroke-primary)]", className)}>
+      <div className="w-full overflow-x-auto">
+        <table className="w-full text-left text-[14px]">
+          <thead className={cn(stickyHeader && "sticky top-0 z-10")}>
+            <tr className={cn("border-b border-[var(--stroke-primary)] bg-[var(--surface-tertiary)]")}>
+              {selectable && (
+                <th className={cn("w-[44px] px-[14px]", headerHeight)}>
+                  <TableCheckbox
+                    checked={allSelected}
+                    indeterminate={!allSelected && someSelected}
+                    onChange={handleSelectAll}
+                    label="Select all rows"
+                  />
+                </th>
+              )}
+              {columns.map((col) => (
+                <th
+                  key={col.key}
+                  scope="col"
+                  style={col.width ? { width: col.width } : undefined}
+                  className={cn(
+                    "px-[16px] py-[12px] text-[12px] font-semibold leading-[16px] text-[var(--header-primary)] whitespace-nowrap",
+                    headerHeight,
+                    col.align === "right" && "text-right",
+                    col.align === "center" && "text-center",
+                    col.sortable && "cursor-pointer select-none",
+                  )}
+                  onClick={col.sortable ? () => handleSort(col.key) : undefined}
+                  aria-sort={
+                    col.sortable && sortKey === col.key
+                      ? sortDirection === "asc"
+                        ? "ascending"
+                        : sortDirection === "desc"
+                        ? "descending"
+                        : "none"
+                      : col.sortable
+                      ? "none"
+                      : undefined
+                  }
+                >
+                  <span className="inline-flex items-center">
+                    {col.header}
+                    {col.sortable && (
+                      <SortIcon direction={sortKey === col.key ? sortDirection : "none"} />
+                    )}
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {sortedData.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns.length + (selectable ? 1 : 0)}
+                  className="px-[16px] py-[40px] text-center text-[14px] text-[var(--text-tertiary)]"
+                >
+                  {emptyState ?? "No data available"}
+                </td>
+              </tr>
+            ) : (
+              sortedData.map((row, rowIndex) => {
+                const key = getRowKey(row, rowIndex);
+                const isSelected = selectedKeys.has(key);
+                const isDisabled = isRowDisabled?.(row) ?? false;
+                const isStriped = striped && rowIndex % 2 === 1;
+
+                return (
+                  <tr
+                    key={key}
+                    className={cn(
+                      "border-b border-[var(--stroke-primary)] last:border-0 transition-colors",
+                      isDisabled
+                        ? "opacity-50"
+                        : isSelected
+                        ? "bg-[var(--color-primary-50)]"
+                        : isStriped
+                        ? "bg-[var(--surface-tertiary)] hover:bg-[var(--surface-primary)]"
+                        : "hover:bg-[var(--surface-primary)]",
+                    )}
+                    aria-selected={selectable ? isSelected : undefined}
+                  >
+                    {selectable && (
+                      <td className="h-[72px] w-[44px] px-[14px]">
+                        <TableCheckbox
+                          checked={isSelected}
+                          disabled={isDisabled}
+                          onChange={(checked) => handleSelectRow(key, checked)}
+                          label={`Select row ${rowIndex + 1}`}
+                        />
+                      </td>
+                    )}
+                    {columns.map((col) => {
+                      const value = row[col.key];
+                      return (
+                        <td
+                          key={col.key}
+                          className={cn(
+                            "h-[72px] px-[16px] leading-[20px] text-[var(--text-primary)]",
+                            col.align === "right" && "text-right",
+                            col.align === "center" && "text-center",
+                          )}
+                        >
+                          {col.render ? col.render(value, row) : String(value ?? "")}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+```
+
+
+### date-time-picker.tsx
+
+```tsx
+"use client";
+
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
+import { Icon } from "@/components/ui/icon";
+import { cn } from "@/lib/utils";
+
+export type DateTimePickerVariant =
+  | "date"
+  | "datetime"
+  | "date-range"
+  | "datetime-range";
+
+export interface DateRange {
+  from: Date | null;
+  to: Date | null;
+}
+
+export interface DateTimePickerProps {
+  variant?: DateTimePickerVariant;
+  value?: Date | DateRange | null;
+  defaultValue?: Date | DateRange | null;
+  onChange?: (value: Date | DateRange | null) => void;
+  placeholder?: string;
+  disabled?: boolean;
+  dir?: "ltr" | "rtl";
+  className?: string;
+  minuteStep?: number;
+}
+
+const MONTHS_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const MONTHS_AR = [
+  "يناير",
+  "فبراير",
+  "مارس",
+  "أبريل",
+  "مايو",
+  "يونيو",
+  "يوليو",
+  "أغسطس",
+  "سبتمبر",
+  "أكتوبر",
+  "نوفمبر",
+  "ديسمبر",
+];
+
+const DAY_LABELS_EN = ["M", "T", "W", "T", "F", "S", "S"];
+const DAY_LABELS_AR = ["ن", "ث", "ر", "خ", "ج", "س", "ح"];
+
+type PresetKey =
+  | "today"
+  | "yesterday"
+  | "this-week"
+  | "last-week"
+  | "this-month"
+  | "last-month"
+  | "this-year"
+  | "last-year"
+  | "all-time";
+
+const PRESETS: { key: PresetKey; labelEn: string; labelAr: string }[] = [
+  { key: "today", labelEn: "Today", labelAr: "اليوم" },
+  { key: "yesterday", labelEn: "Yesterday", labelAr: "أمس" },
+  { key: "this-week", labelEn: "This Week", labelAr: "هذا الأسبوع" },
+  { key: "last-week", labelEn: "Last Week", labelAr: "الأسبوع الماضي" },
+  { key: "this-month", labelEn: "This Month", labelAr: "هذا الشهر" },
+  { key: "last-month", labelEn: "Last Month", labelAr: "الشهر الماضي" },
+  { key: "this-year", labelEn: "This Year", labelAr: "هذه السنة" },
+  { key: "last-year", labelEn: "Last Year", labelAr: "السنة الماضية" },
+  { key: "all-time", labelEn: "All Time", labelAr: "كل الأوقات" },
+];
+
+function startOfDay(d: Date): Date {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function addDays(d: Date, n: number): Date {
+  const x = new Date(d);
+  x.setDate(x.getDate() + n);
+  return x;
+}
+
+function isSameDay(a: Date | null, b: Date | null): boolean {
+  if (!a || !b) return false;
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function isInRange(day: Date, from: Date | null, to: Date | null): boolean {
+  if (!from || !to) return false;
+  const t = startOfDay(day).getTime();
+  return t > startOfDay(from).getTime() && t < startOfDay(to).getTime();
+}
+
+function formatDate(d: Date | null, rtl: boolean): string {
+  if (!d) return "";
+  const day = d.getDate();
+  const month = (rtl ? MONTHS_AR : MONTHS_EN)[d.getMonth()].slice(0, 3);
+  const year = d.getFullYear();
+  return `${day} ${month}, ${year}`;
+}
+
+function formatTime(d: Date | null, rtl: boolean): string {
+  if (!d) return rtl ? "12:00 ص" : "12:00 AM";
+  let h = d.getHours();
+  const m = d.getMinutes();
+  const suffix = rtl ? (h >= 12 ? "م" : "ص") : h >= 12 ? "PM" : "AM";
+  h = h % 12 === 0 ? 12 : h % 12;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")} ${suffix}`;
+}
+
+function buildMonthGrid(year: number, month: number): (Date | null)[] {
+  const first = new Date(year, month, 1);
+  const offset = (first.getDay() + 6) % 7;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const cells: (Date | null)[] = [];
+  for (let i = 0; i < offset; i++) cells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
+  while (cells.length % 7 !== 0) cells.push(null);
+  return cells;
+}
+
+function getPresetRange(key: PresetKey): { from: Date | null; to: Date | null } {
+  const now = startOfDay(new Date());
+  switch (key) {
+    case "today":
+      return { from: now, to: now };
+    case "yesterday": {
+      const y = addDays(now, -1);
+      return { from: y, to: y };
+    }
+    case "this-week": {
+      const dayIdx = (now.getDay() + 6) % 7;
+      return { from: addDays(now, -dayIdx), to: addDays(now, 6 - dayIdx) };
+    }
+    case "last-week": {
+      const dayIdx = (now.getDay() + 6) % 7;
+      const end = addDays(now, -dayIdx - 1);
+      return { from: addDays(end, -6), to: end };
+    }
+    case "this-month":
+      return {
+        from: new Date(now.getFullYear(), now.getMonth(), 1),
+        to: new Date(now.getFullYear(), now.getMonth() + 1, 0),
+      };
+    case "last-month":
+      return {
+        from: new Date(now.getFullYear(), now.getMonth() - 1, 1),
+        to: new Date(now.getFullYear(), now.getMonth(), 0),
+      };
+    case "this-year":
+      return {
+        from: new Date(now.getFullYear(), 0, 1),
+        to: new Date(now.getFullYear(), 11, 31),
+      };
+    case "last-year":
+      return {
+        from: new Date(now.getFullYear() - 1, 0, 1),
+        to: new Date(now.getFullYear() - 1, 11, 31),
+      };
+    case "all-time":
+      return { from: null, to: null };
+  }
+}
+
+interface CalendarProps {
+  view: Date;
+  onViewChange: (d: Date) => void;
+  selected: Date | null;
+  rangeFrom: Date | null;
+  rangeTo: Date | null;
+  onSelect: (d: Date) => void;
+  rtl: boolean;
+  showNav?: boolean;
+}
+
+function CalendarMonth({
+  view,
+  onViewChange,
+  selected,
+  rangeFrom,
+  rangeTo,
+  onSelect,
+  rtl,
+  showNav = true,
+}: CalendarProps) {
+  const [mode, setMode] = useState<"days" | "months" | "years">("days");
+  const monthLabels = rtl ? MONTHS_AR : MONTHS_EN;
+  const dayLabels = rtl ? DAY_LABELS_AR : DAY_LABELS_EN;
+  const cells = useMemo(
+    () => buildMonthGrid(view.getFullYear(), view.getMonth()),
+    [view]
+  );
+  const today = startOfDay(new Date());
+
+  const goPrev = () => {
+    const d = new Date(view);
+    d.setMonth(d.getMonth() - 1);
+    onViewChange(d);
+  };
+  const goNext = () => {
+    const d = new Date(view);
+    d.setMonth(d.getMonth() + 1);
+    onViewChange(d);
+  };
+
+  return (
+    <div className="flex flex-col gap-[12px]">
+      <div className="flex items-center justify-between gap-[8px]">
+        <div className="flex items-center gap-[6px]">
+          <button
+            type="button"
+            onClick={() => setMode(mode === "months" ? "days" : "months")}
+            className="inline-flex h-[28px] items-center gap-[4px] rounded-[6px] px-[6px] text-[14px] font-medium leading-[20px] text-[var(--header-primary)] hover:bg-[var(--surface-tertiary)]"
+          >
+            {monthLabels[view.getMonth()]}
+            <Icon name="caret-down" className="h-[12px] w-[12px] text-[var(--text-tertiary)]" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode(mode === "years" ? "days" : "years")}
+            className="inline-flex h-[28px] items-center gap-[4px] rounded-[6px] px-[6px] text-[14px] font-medium leading-[20px] text-[var(--header-primary)] hover:bg-[var(--surface-tertiary)]"
+          >
+            {view.getFullYear()}
+            <Icon name="caret-down" className="h-[12px] w-[12px] text-[var(--text-tertiary)]" />
+          </button>
+        </div>
+        {showNav && (
+          <div className="flex items-center gap-[4px]">
+            <button
+              type="button"
+              onClick={goPrev}
+              aria-label={rtl ? "الشهر التالي" : "Previous month"}
+              className="inline-flex h-[28px] w-[28px] items-center justify-center rounded-[6px] text-[var(--text-tertiary)] hover:bg-[var(--surface-tertiary)] hover:text-[var(--header-primary)]"
+            >
+              <Icon name={rtl ? "caret-right" : "caret-left"} className="h-[14px] w-[14px]" />
+            </button>
+            <button
+              type="button"
+              onClick={goNext}
+              aria-label={rtl ? "الشهر السابق" : "Next month"}
+              className="inline-flex h-[28px] w-[28px] items-center justify-center rounded-[6px] text-[var(--text-tertiary)] hover:bg-[var(--surface-tertiary)] hover:text-[var(--header-primary)]"
+            >
+              <Icon name={rtl ? "caret-left" : "caret-right"} className="h-[14px] w-[14px]" />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {mode === "days" && (
+        <>
+          <div className="grid grid-cols-7 gap-y-[4px]">
+            {dayLabels.map((lbl, i) => (
+              <div
+                key={`${lbl}-${i}`}
+                className="flex h-[28px] items-center justify-center text-[12px] font-medium leading-[16px] text-[var(--text-tertiary)]"
+              >
+                {lbl}
+              </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-y-[2px]">
+            {cells.map((d, i) => {
+              if (!d) return <div key={`e-${i}`} className="h-[32px] w-[32px]" />;
+              const isSelected = isSameDay(d, selected);
+              const isRangeStart = isSameDay(d, rangeFrom);
+              const isRangeEnd = isSameDay(d, rangeTo);
+              const isInBetween = isInRange(d, rangeFrom, rangeTo);
+              const isToday = isSameDay(d, today);
+              const active = isSelected || isRangeStart || isRangeEnd;
+              return (
+                <div key={d.toISOString()} className="flex h-[32px] items-center justify-center">
+                  <button
+                    type="button"
+                    onClick={() => onSelect(d)}
+                    className={cn(
+                      "relative inline-flex h-[32px] w-[32px] items-center justify-center rounded-[8px] text-[12px] leading-[16px] transition-colors",
+                      active &&
+                        "bg-[var(--color-primary-600)] font-medium text-[var(--color-neutral-0)]",
+                      !active &&
+                        isInBetween &&
+                        "bg-[var(--color-primary-50)] text-[var(--header-primary)] dark:bg-[var(--color-primary-950)]",
+                      !active &&
+                        !isInBetween &&
+                        "text-[var(--header-primary)] hover:bg-[var(--surface-tertiary)]"
+                    )}
+                    aria-pressed={active}
+                    aria-label={d.toDateString()}
+                  >
+                    {d.getDate()}
+                    {isToday && !active && (
+                      <span className="absolute bottom-[4px] left-1/2 h-[4px] w-[4px] -translate-x-1/2 rounded-full bg-[var(--color-primary-600)]" />
+                    )}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {mode === "months" && (
+        <div className="grid grid-cols-3 gap-[8px]">
+          {monthLabels.map((m, idx) => {
+            const active = idx === view.getMonth();
+            return (
+              <button
+                key={m}
+                type="button"
+                onClick={() => {
+                  const d = new Date(view);
+                  d.setMonth(idx);
+                  onViewChange(d);
+                  setMode("days");
+                }}
+                className={cn(
+                  "inline-flex h-[32px] items-center justify-center rounded-[8px] px-[8px] text-[12px] leading-[16px] transition-colors",
+                  active
+                    ? "bg-[var(--color-primary-600)] font-medium text-[var(--color-neutral-0)]"
+                    : "text-[var(--header-primary)] hover:bg-[var(--surface-tertiary)]"
+                )}
+              >
+                {m.slice(0, rtl ? 4 : 3)}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {mode === "years" && (
+        <div className="grid grid-cols-3 gap-[8px]">
+          {Array.from({ length: 12 }).map((_, i) => {
+            const base = view.getFullYear() - 6 + i;
+            const active = base === view.getFullYear();
+            return (
+              <button
+                key={base}
+                type="button"
+                onClick={() => {
+                  const d = new Date(view);
+                  d.setFullYear(base);
+                  onViewChange(d);
+                  setMode("days");
+                }}
+                className={cn(
+                  "inline-flex h-[32px] items-center justify-center rounded-[8px] px-[8px] text-[12px] leading-[16px] transition-colors",
+                  active
+                    ? "bg-[var(--color-primary-600)] font-medium text-[var(--color-neutral-0)]"
+                    : "text-[var(--header-primary)] hover:bg-[var(--surface-tertiary)]"
+                )}
+              >
+                {base}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function TimeSelect({
+  value,
+  onChange,
+  rtl,
+  disabled,
+  minuteStep = 15,
+}: {
+  value: Date;
+  onChange: (d: Date) => void;
+  rtl: boolean;
+  disabled?: boolean;
+  minuteStep?: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+
+  const times: Date[] = useMemo(() => {
+    const list: Date[] = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += minuteStep) {
+        const t = new Date(value);
+        t.setHours(h, m, 0, 0);
+        list.push(t);
+      }
+    }
+    return list;
+  }, [minuteStep, value]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          "inline-flex h-[28px] w-full items-center justify-between gap-[6px] rounded-[8px] border border-[var(--stroke-primary)] px-[10px] text-[12px] leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]",
+          disabled && "cursor-not-allowed opacity-60"
+        )}
+      >
+        <span>{formatTime(value, rtl)}</span>
+        <Icon name="caret-down" className="h-[12px] w-[12px] text-[var(--text-tertiary)]" />
+      </button>
+      {open && (
+        <div
+          className="absolute top-[calc(100%+4px)] z-10 max-h-[180px] w-full min-w-[120px] overflow-y-auto rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-primary)] p-[4px] shadow-[var(--shadow-elevation-3)]"
+          style={{ [rtl ? "right" : "left"]: 0 }}
+        >
+          {times.map((t) => {
+            const active =
+              t.getHours() === value.getHours() && t.getMinutes() === value.getMinutes();
+            return (
+              <button
+                key={t.toISOString()}
+                type="button"
+                onClick={() => {
+                  const next = new Date(value);
+                  next.setHours(t.getHours(), t.getMinutes(), 0, 0);
+                  onChange(next);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex h-[28px] w-full items-center rounded-[6px] px-[8px] text-[12px] leading-[16px] transition-colors",
+                  active
+                    ? "bg-[var(--color-primary-50)] text-[var(--color-primary-700)] dark:bg-[var(--color-primary-950)] dark:text-[var(--color-primary-400)]"
+                    : "text-[var(--header-primary)] hover:bg-[var(--surface-tertiary)]"
+                )}
+              >
+                {formatTime(t, rtl)}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function DateTimePicker({
+  variant = "date",
+  value: controlledValue,
+  defaultValue,
+  onChange,
+  placeholder,
+  disabled,
+  dir = "ltr",
+  className,
+  minuteStep = 15,
+}: DateTimePickerProps) {
+  const rtl = dir === "rtl";
+  const isRange = variant === "date-range" || variant === "datetime-range";
+  const hasTime = variant === "datetime" || variant === "datetime-range";
+
+  const [internal, setInternal] = useState<Date | DateRange | null>(
+    defaultValue ?? (isRange ? { from: null, to: null } : null)
+  );
+  const value = controlledValue ?? internal;
+
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<Date | DateRange | null>(value);
+  const [view, setView] = useState<Date>(() => {
+    const now = new Date();
+    if (isRange) {
+      const r = (value as DateRange) || { from: null, to: null };
+      return r.from ? new Date(r.from) : now;
+    }
+    return (value as Date) || now;
+  });
+  const [selectingEnd, setSelectingEnd] = useState(false);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+  const [popoverPos, setPopoverPos] = useState<{ top: number; left: number }>({
+    top: 0,
+    left: 0,
+  });
+
+  useEffect(() => setMounted(true), []);
+
+  useLayoutEffect(() => {
+    if (!open || !triggerRef.current) return;
+    const updatePos = () => {
+      const rect = triggerRef.current!.getBoundingClientRect();
+      const popW = popoverRef.current?.offsetWidth ?? 0;
+      setPopoverPos({
+        top: rect.bottom + 8,
+        left: rtl ? rect.right - popW : rect.left,
+      });
+    };
+    updatePos();
+    window.addEventListener("resize", updatePos);
+    window.addEventListener("scroll", updatePos, true);
+    return () => {
+      window.removeEventListener("resize", updatePos);
+      window.removeEventListener("scroll", updatePos, true);
+    };
+  }, [open, rtl, draft]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      const t = e.target as Node;
+      const inTrigger = containerRef.current && containerRef.current.contains(t);
+      const inPopover = popoverRef.current && popoverRef.current.contains(t);
+      if (!inTrigger && !inPopover) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (open) setDraft(value);
+  }, [open, value]);
+
+  const commit = (next: Date | DateRange | null) => {
+    if (controlledValue === undefined) setInternal(next);
+    onChange?.(next);
+  };
+
+  const handleApply = () => {
+    commit(draft);
+    setOpen(false);
+  };
+  const handleCancel = () => {
+    setDraft(value);
+    setOpen(false);
+  };
+  const handleReset = () => {
+    const next: Date | DateRange | null = isRange ? { from: null, to: null } : null;
+    setDraft(next);
+  };
+  const handleToday = () => {
+    const now = new Date();
+    if (isRange) {
+      setDraft({ from: startOfDay(now), to: startOfDay(now) });
+    } else {
+      const base = (draft as Date) ?? new Date();
+      const next = new Date(now);
+      if (hasTime) next.setHours(base.getHours(), base.getMinutes(), 0, 0);
+      else next.setHours(0, 0, 0, 0);
+      setDraft(next);
+    }
+    setView(now);
+  };
+
+  const applyPreset = (key: PresetKey) => {
+    const r = getPresetRange(key);
+    setDraft(r);
+    if (r.from) setView(new Date(r.from));
+  };
+
+  const selectDay = (d: Date) => {
+    if (!isRange) {
+      const base = (draft as Date) ?? new Date();
+      const next = new Date(d);
+      if (hasTime) next.setHours(base.getHours(), base.getMinutes(), 0, 0);
+      setDraft(next);
+      return;
+    }
+    const r = (draft as DateRange) ?? { from: null, to: null };
+    if (!r.from || (r.from && r.to) || selectingEnd === false) {
+      if (!r.from || (r.from && r.to)) {
+        setDraft({ from: d, to: null });
+        setSelectingEnd(true);
+      } else {
+        if (d < r.from) setDraft({ from: d, to: r.from });
+        else setDraft({ ...r, to: d });
+        setSelectingEnd(false);
+      }
+    } else {
+      if (d < (r.from as Date)) setDraft({ from: d, to: r.from });
+      else setDraft({ ...r, to: d });
+      setSelectingEnd(false);
+    }
+  };
+
+  const trigger = useMemo(() => {
+    const input = (text: string, placeholder: string, highlight: boolean) => (
+      <div
+        className={cn(
+          "inline-flex h-[28px] min-w-[96px] items-center rounded-[8px] border px-[10px] text-[12px] leading-[16px] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]",
+          highlight
+            ? "border-[var(--color-primary-400)]"
+            : "border-[var(--stroke-primary)]",
+          text ? "text-[var(--header-primary)]" : "text-[var(--text-tertiary)]"
+        )}
+      >
+        {text || placeholder}
+      </div>
+    );
+
+    if (!isRange) {
+      const d = (value as Date) ?? null;
+      return (
+        <div className="flex items-center gap-[6px]">
+          {input(formatDate(d, rtl), placeholder ?? (rtl ? "تاريخ" : "Select date"), open)}
+          {hasTime && (
+            <div className="inline-flex h-[28px] min-w-[110px] items-center justify-between gap-[6px] rounded-[8px] border border-[var(--stroke-primary)] px-[10px] text-[12px] leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]">
+              <span>{formatTime(d, rtl)}</span>
+              <Icon name="caret-down" className="h-[12px] w-[12px] text-[var(--text-tertiary)]" />
+            </div>
+          )}
+        </div>
+      );
+    }
+    const r = (value as DateRange) ?? { from: null, to: null };
+    return (
+      <div className="flex items-center gap-[6px]">
+        {input(formatDate(r.from, rtl), rtl ? "من" : "From", open)}
+        {hasTime && (
+          <div className="inline-flex h-[28px] min-w-[96px] items-center justify-between gap-[6px] rounded-[8px] border border-[var(--stroke-primary)] px-[10px] text-[12px] leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]">
+            <span>{formatTime(r.from, rtl)}</span>
+            <Icon name="caret-down" className="h-[12px] w-[12px] text-[var(--text-tertiary)]" />
+          </div>
+        )}
+        <span className="text-[12px] font-medium leading-[16px] text-[var(--text-tertiary)]">
+          {rtl ? "إلى" : "To"}
+        </span>
+        {input(formatDate(r.to, rtl), rtl ? "إلى" : "To", false)}
+        {hasTime && (
+          <div className="inline-flex h-[28px] min-w-[96px] items-center justify-between gap-[6px] rounded-[8px] border border-[var(--stroke-primary)] px-[10px] text-[12px] leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]">
+            <span>{formatTime(r.to, rtl)}</span>
+            <Icon name="caret-down" className="h-[12px] w-[12px] text-[var(--text-tertiary)]" />
+          </div>
+        )}
+      </div>
+    );
+  }, [hasTime, isRange, open, placeholder, rtl, value]);
+
+  const secondView = useMemo(() => {
+    const d = new Date(view);
+    d.setMonth(d.getMonth() + 1);
+    return d;
+  }, [view]);
+
+  const draftAsRange = (draft as DateRange) || { from: null, to: null };
+  const draftAsDate = draft as Date | null;
+  const presetLabelKey: "labelEn" | "labelAr" = rtl ? "labelAr" : "labelEn";
+
+  return (
+    <div
+      ref={containerRef}
+      dir={dir}
+      className={cn("relative inline-block", disabled && "pointer-events-none opacity-60", className)}
+    >
+      <button
+        ref={triggerRef}
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        className="inline-flex items-center gap-[6px]"
+      >
+        {trigger}
+      </button>
+
+      {open && mounted && createPortal(
+        <div
+          ref={popoverRef}
+          role="dialog"
+          dir={dir}
+          style={{ position: "fixed", top: popoverPos.top, left: popoverPos.left, zIndex: 50 }}
+          className="flex rounded-[12px] border border-[var(--stroke-primary)] bg-[var(--surface-primary)] shadow-[var(--shadow-elevation-4)]"
+        >
+          {isRange && (
+            <div className="flex w-[140px] shrink-0 flex-col border-e border-[var(--stroke-primary)] p-[8px]">
+              {PRESETS.map((p) => (
+                <button
+                  key={p.key}
+                  type="button"
+                  onClick={() => applyPreset(p.key)}
+                  className="flex h-[32px] w-full items-center rounded-[6px] px-[10px] text-[12px] leading-[16px] text-[var(--text-secondary)] transition-colors hover:bg-[var(--surface-tertiary)] hover:text-[var(--header-primary)]"
+                >
+                  {p[presetLabelKey]}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="flex min-w-[280px] flex-col p-[16px]">
+            {isRange ? (
+              <>
+                <div className="mb-[12px] flex flex-wrap items-center gap-[6px]">
+                  <span className="text-[12px] font-medium leading-[16px] text-[var(--header-primary)]">
+                    {rtl ? "من" : "From"}
+                  </span>
+                  <div className="inline-flex h-[28px] min-w-[110px] items-center rounded-[8px] border border-[var(--color-primary-400)] px-[10px] text-[12px] leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]">
+                    {formatDate(draftAsRange.from, rtl) || (rtl ? "تاريخ" : "Select date")}
+                  </div>
+                  {hasTime && draftAsRange.from && (
+                    <div className="w-[120px]">
+                      <TimeSelect
+                        value={draftAsRange.from}
+                        onChange={(t) =>
+                          setDraft({ ...draftAsRange, from: t })
+                        }
+                        rtl={rtl}
+                        minuteStep={minuteStep}
+                      />
+                    </div>
+                  )}
+                  {!hasTime && (
+                    <button
+                      type="button"
+                      onClick={handleToday}
+                      className="inline-flex h-[28px] items-center rounded-[8px] border border-[var(--stroke-primary)] px-[10px] text-[12px] font-medium leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)] hover:bg-[var(--surface-tertiary)]"
+                    >
+                      {rtl ? "اليوم" : "Today"}
+                    </button>
+                  )}
+                  <span className="text-[12px] font-medium leading-[16px] text-[var(--header-primary)]">
+                    {rtl ? "إلى" : "To"}
+                  </span>
+                  <div className="inline-flex h-[28px] min-w-[110px] items-center rounded-[8px] border border-[var(--stroke-primary)] px-[10px] text-[12px] leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]">
+                    {formatDate(draftAsRange.to, rtl) || (rtl ? "تاريخ" : "Select date")}
+                  </div>
+                  {hasTime && draftAsRange.to && (
+                    <div className="w-[120px]">
+                      <TimeSelect
+                        value={draftAsRange.to}
+                        onChange={(t) =>
+                          setDraft({ ...draftAsRange, to: t })
+                        }
+                        rtl={rtl}
+                        minuteStep={minuteStep}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-[24px]">
+                  <CalendarMonth
+                    view={view}
+                    onViewChange={setView}
+                    selected={null}
+                    rangeFrom={draftAsRange.from}
+                    rangeTo={draftAsRange.to}
+                    onSelect={selectDay}
+                    rtl={rtl}
+                    showNav={false}
+                  />
+                  <CalendarMonth
+                    view={secondView}
+                    onViewChange={(d) => {
+                      const prev = new Date(d);
+                      prev.setMonth(prev.getMonth() - 1);
+                      setView(prev);
+                    }}
+                    selected={null}
+                    rangeFrom={draftAsRange.from}
+                    rangeTo={draftAsRange.to}
+                    onSelect={selectDay}
+                    rtl={rtl}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mb-[12px] flex flex-wrap items-center gap-[6px]">
+                  <div className="inline-flex h-[28px] min-w-[140px] items-center rounded-[8px] border border-[var(--color-primary-400)] px-[10px] text-[12px] leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]">
+                    {formatDate(draftAsDate, rtl) || (rtl ? "تاريخ" : "Select date")}
+                  </div>
+                  {hasTime && draftAsDate && (
+                    <div className="w-[120px]">
+                      <TimeSelect
+                        value={draftAsDate}
+                        onChange={(t) => setDraft(t)}
+                        rtl={rtl}
+                        minuteStep={minuteStep}
+                      />
+                    </div>
+                  )}
+                  {!hasTime && (
+                    <button
+                      type="button"
+                      onClick={handleToday}
+                      className="inline-flex h-[28px] items-center rounded-[8px] border border-[var(--stroke-primary)] px-[10px] text-[12px] font-medium leading-[16px] text-[var(--header-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)] hover:bg-[var(--surface-tertiary)]"
+                    >
+                      {rtl ? "اليوم" : "Today"}
+                    </button>
+                  )}
+                </div>
+                <CalendarMonth
+                  view={view}
+                  onViewChange={setView}
+                  selected={draftAsDate}
+                  rangeFrom={null}
+                  rangeTo={null}
+                  onSelect={selectDay}
+                  rtl={rtl}
+                />
+              </>
+            )}
+
+            <div className="mt-[16px] flex items-center justify-between border-t border-[var(--stroke-primary)] pt-[12px]">
+              <button
+                type="button"
+                onClick={handleReset}
+                className="inline-flex h-[32px] items-center rounded-[8px] px-[10px] text-[12px] font-medium leading-[16px] text-[var(--color-error-600)] transition-colors hover:bg-[var(--color-error-50)] dark:hover:bg-[var(--color-error-950)]"
+              >
+                {rtl ? "إعادة تعيين" : "Reset"}
+              </button>
+              <div className="flex items-center gap-[8px]">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="inline-flex h-[32px] items-center rounded-[8px] border border-[var(--color-primary-400)] px-[12px] text-[12px] font-medium leading-[16px] text-[var(--color-primary-700)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)] transition-colors hover:bg-[var(--color-primary-50)] dark:text-[var(--color-primary-400)] dark:hover:bg-[var(--color-primary-950)]"
+                >
+                  {rtl ? "إلغاء" : "Cancel"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleApply}
+                  className="inline-flex h-[32px] items-center rounded-[8px] bg-[var(--color-primary-600)] px-[12px] text-[12px] font-medium leading-[16px] text-[var(--color-neutral-0)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)] transition-colors hover:bg-[var(--color-primary-700)]"
+                >
+                  {rtl ? "تطبيق" : "Apply"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
+```
+
+
+### dropdown.tsx
+
+```tsx
+"use client";
+
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
+import { createPortal } from "react-dom";
+import { Icon } from "@/components/ui/icon";
+import { cn } from "@/lib/utils";
+
+export type DropdownSize = "md" | "sm";
+
+export interface DropdownOption {
+  value: string;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+}
+
+export interface DropdownProps {
+  options: DropdownOption[];
+  value?: string | string[];
+  defaultValue?: string | string[];
+  onChange?: (value: string | string[]) => void;
+  placeholder?: string;
+  label?: string;
+  hint?: string;
+  error?: string;
+  size?: DropdownSize;
+  multiple?: boolean;
+  searchable?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+  direction?: "ltr" | "rtl";
+  leadingIcon?: ReactNode;
+  className?: string;
+  name?: string;
+  id?: string;
+  mandatory?: boolean;
+}
+
+const sizeStyles: Record<DropdownSize, { trigger: string; text: string }> = {
+  md: {
+    trigger: "min-h-[44px] px-[14px] py-[10px]",
+    text: "text-[16px] leading-[24px]",
+  },
+  sm: {
+    trigger: "min-h-[40px] px-[12px] py-[8px]",
+    text: "text-[14px] leading-[20px]",
+  },
+};
+
+const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(function Dropdown(
+  {
+    options,
+    value: controlledValue,
+    defaultValue,
+    onChange,
+    placeholder = "Select an option",
+    label,
+    hint,
+    error,
+    size = "md",
+    multiple = false,
+    searchable = false,
+    disabled = false,
+    readOnly = false,
+    direction = "ltr",
+    leadingIcon,
+    className,
+    name,
+    id,
+    mandatory = false,
+  },
+  ref,
+) {
+  const reactId = useId();
+  const fieldId = id ?? `dropdown-${reactId}`;
+  const labelId = `${fieldId}-label`;
+  const hintId = `${fieldId}-hint`;
+  const errorId = `${fieldId}-error`;
+  const listboxId = `${fieldId}-listbox`;
+
+  const isControlled = controlledValue !== undefined;
+  const [internalValue, setInternalValue] = useState<string | string[]>(() => {
+    if (defaultValue !== undefined) return defaultValue;
+    return multiple ? [] : "";
+  });
+  const currentValue = (isControlled ? controlledValue : internalValue) as
+    | string
+    | string[];
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [activeIndex, setActiveIndex] = useState<number>(-1);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const selectedValues = useMemo<string[]>(() => {
+    if (multiple) return Array.isArray(currentValue) ? currentValue : [];
+    return typeof currentValue === "string" && currentValue
+      ? [currentValue]
+      : [];
+  }, [currentValue, multiple]);
+
+  const filteredOptions = useMemo(() => {
+    if (!searchable || !query) return options;
+    const q = query.toLowerCase();
+    return options.filter(
+      (o) =>
+        o.label.toLowerCase().includes(q) ||
+        o.description?.toLowerCase().includes(q),
+    );
+  }, [options, query, searchable]);
+
+  const commit = useCallback(
+    (next: string | string[]) => {
+      if (!isControlled) setInternalValue(next);
+      onChange?.(next);
+    },
+    [isControlled, onChange],
+  );
+
+  const handleSelect = useCallback(
+    (option: DropdownOption) => {
+      if (option.disabled) return;
+      if (multiple) {
+        const current = Array.isArray(currentValue) ? currentValue : [];
+        const exists = current.includes(option.value);
+        const next = exists
+          ? current.filter((v) => v !== option.value)
+          : [...current, option.value];
+        commit(next);
+      } else {
+        commit(option.value);
+        setIsOpen(false);
+        setQuery("");
+      }
+    },
+    [commit, currentValue, multiple],
+  );
+
+  const removeTag = useCallback(
+    (optionValue: string) => {
+      if (!multiple) return;
+      const current = Array.isArray(currentValue) ? currentValue : [];
+      commit(current.filter((v) => v !== optionValue));
+    },
+    [commit, currentValue, multiple],
+  );
+
+  const selectedOptions = useMemo(
+    () => options.filter((o) => selectedValues.includes(o.value)),
+    [options, selectedValues],
+  );
+
+  useEffect(() => {
+    if (!isOpen) return;
+    function onDocMouseDown(event: MouseEvent) {
+      const target = event.target as Node | null;
+      if (!target) return;
+      const inContainer = containerRef.current?.contains(target);
+      const inMenu = menuRef.current?.contains(target);
+      if (!inContainer && !inMenu) {
+        setIsOpen(false);
+        setQuery("");
+      }
+    }
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, [isOpen]);
+
+  useLayoutEffect(() => {
+    if (!isOpen || !mounted) return;
+    const updatePosition = () => {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      const menu = menuRef.current;
+      if (!rect || !menu) return;
+      menu.style.left = `${rect.left}px`;
+      menu.style.top = `${rect.bottom + 6}px`;
+      menu.style.width = `${rect.width}px`;
+    };
+    updatePosition();
+    const onScroll = (event: Event) => {
+      if (menuRef.current?.contains(event.target as Node)) return;
+      updatePosition();
+    };
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", updatePosition);
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [isOpen, mounted, filteredOptions.length]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setActiveIndex(-1);
+      return;
+    }
+    const firstSelected = filteredOptions.findIndex((o) =>
+      selectedValues.includes(o.value),
+    );
+    setActiveIndex(firstSelected >= 0 ? firstSelected : 0);
+    if (searchable) {
+      const timeoutId = window.setTimeout(() => searchRef.current?.focus(), 10);
+      return () => window.clearTimeout(timeoutId);
+    }
+  }, [isOpen, filteredOptions, selectedValues, searchable]);
+
+  const openMenu = () => {
+    if (disabled || readOnly) return;
+    setIsOpen(true);
+  };
+
+  const toggleMenu = () => {
+    if (disabled || readOnly) return;
+    setIsOpen((v) => !v);
+  };
+
+  const handleTriggerKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (disabled || readOnly) return;
+    if (["ArrowDown", "ArrowUp", "Enter", " "].includes(e.key)) {
+      e.preventDefault();
+      openMenu();
+    }
+  };
+
+  const moveActive = (delta: number) => {
+    if (filteredOptions.length === 0) return;
+    setActiveIndex((current) => {
+      let next = current + delta;
+      let guard = 0;
+      while (guard < filteredOptions.length) {
+        if (next < 0) next = filteredOptions.length - 1;
+        if (next >= filteredOptions.length) next = 0;
+        if (!filteredOptions[next]?.disabled) return next;
+        next += delta > 0 ? 1 : -1;
+        guard += 1;
+      }
+      return current;
+    });
+  };
+
+  const handleMenuKeyDown = (e: KeyboardEvent<HTMLElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      moveActive(1);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      moveActive(-1);
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      setActiveIndex(0);
+    } else if (e.key === "End") {
+      e.preventDefault();
+      setActiveIndex(filteredOptions.length - 1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const option = filteredOptions[activeIndex];
+      if (option) handleSelect(option);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setIsOpen(false);
+      setQuery("");
+    } else if (e.key === "Tab") {
+      setIsOpen(false);
+    }
+  };
+
+  const displayText = useMemo(() => {
+    if (multiple) return null;
+    const selected = selectedOptions[0];
+    return selected?.label ?? "";
+  }, [multiple, selectedOptions]);
+
+  const hasSelection = selectedValues.length > 0;
+
+  const triggerStateClasses = error
+    ? "border-[var(--color-error-600)] hover:border-[var(--color-error-600)]"
+    : isOpen
+      ? "border-[var(--color-primary-600)] shadow-[0_0_0_4px_var(--color-primary-100)]"
+      : "border-[var(--stroke-primary)] hover:border-[var(--stroke-secondary)] focus-visible:border-[var(--color-primary-300)] focus-visible:shadow-[0_0_0_4px_var(--color-primary-100)]";
+
+  const triggerBg = readOnly
+    ? "bg-[var(--surface-tertiary)]"
+    : disabled
+      ? "bg-[var(--surface-disabled)]"
+      : "bg-transparent";
+
+  const describedBy = error ? errorId : hint ? hintId : undefined;
+
+  return (
+    <div
+      dir={direction}
+      className={cn("flex w-full flex-col gap-[6px]", className)}
+      ref={containerRef}
+    >
+      {label && (
+        <div className="flex items-center justify-between">
+          <label
+            id={labelId}
+            htmlFor={fieldId}
+            className="flex items-center gap-[4px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)]"
+          >
+            {label}
+            {mandatory && (
+              <span
+                aria-hidden
+                className="text-[14px] font-medium leading-[20px] text-[var(--color-error-600)]"
+              >
+                *
+              </span>
+            )}
+          </label>
+        </div>
+      )}
+
+      <div className="relative">
+        <button
+          ref={(node) => {
+            triggerRef.current = node;
+            if (typeof ref === "function") ref(node);
+            else if (ref) (ref as React.MutableRefObject<HTMLButtonElement | null>).current = node;
+          }}
+          type="button"
+          id={fieldId}
+          role="combobox"
+          aria-haspopup="listbox"
+          aria-expanded={isOpen}
+          aria-controls={isOpen ? listboxId : undefined}
+          aria-labelledby={label ? labelId : undefined}
+          aria-describedby={describedBy}
+          aria-invalid={error ? true : undefined}
+          disabled={disabled}
+          aria-readonly={readOnly || undefined}
+          data-state={isOpen ? "open" : "closed"}
+          onClick={toggleMenu}
+          onKeyDown={handleTriggerKeyDown}
+          name={!multiple && name ? name : undefined}
+          className={cn(
+            "flex w-full items-center gap-[8px] rounded-[8px] border text-left transition-[box-shadow,border-color] duration-150 shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]",
+            "focus:outline-none",
+            sizeStyles[size].trigger,
+            triggerBg,
+            triggerStateClasses,
+            (disabled || readOnly) && "cursor-not-allowed",
+            !disabled && !readOnly && "cursor-pointer",
+          )}
+        >
+          {leadingIcon && (
+            <span
+              className={cn(
+                "inline-flex h-[20px] w-[20px] shrink-0 items-center justify-center",
+                error
+                  ? "text-[var(--color-error-600)]"
+                  : disabled
+                    ? "text-[var(--text-alt-tertiary)]"
+                    : "text-[var(--icon-tertiary)]",
+              )}
+            >
+              {leadingIcon}
+            </span>
+          )}
+
+          <span
+            className={cn(
+              "flex min-w-0 flex-1 flex-wrap items-center gap-[6px]",
+              sizeStyles[size].text,
+            )}
+          >
+            {multiple && hasSelection ? (
+              selectedOptions.map((opt) => (
+                <span
+                  key={opt.value}
+                  className="inline-flex items-center gap-[4px] rounded-[6px] border border-[var(--stroke-primary)] bg-[var(--surface-primary)] px-[6px] py-[2px] text-[12px] font-medium leading-[16px] text-[var(--text-primary)]"
+                >
+                  {opt.label}
+                  {!disabled && !readOnly && (
+                    <span
+                      role="button"
+                      aria-label={`Remove ${opt.label}`}
+                      tabIndex={-1}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeTag(opt.value);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          removeTag(opt.value);
+                        }
+                      }}
+                      className="inline-flex h-[14px] w-[14px] cursor-pointer items-center justify-center rounded-[999px] text-[var(--icon-tertiary)] hover:bg-[var(--surface-alt-tertiary)] hover:text-[var(--text-primary)]"
+                    >
+                      <Icon name="x" className="h-[10px] w-[10px]" />
+                    </span>
+                  )}
+                </span>
+              ))
+            ) : (
+              <span
+                className={cn(
+                  "truncate",
+                  hasSelection
+                    ? disabled
+                      ? "text-[var(--text-alt-tertiary)]"
+                      : readOnly
+                        ? "text-[var(--text-secondary)]"
+                        : "text-[var(--text-primary)]"
+                    : disabled
+                      ? "text-[var(--text-alt-tertiary)]"
+                      : "text-[var(--text-tertiary)]",
+                )}
+              >
+                {displayText || placeholder}
+              </span>
+            )}
+          </span>
+
+          <Icon
+            name="caret-down"
+            className={cn(
+              "h-[16px] w-[16px] shrink-0 transition-transform duration-200",
+              isOpen && "rotate-180",
+              error
+                ? "text-[var(--color-error-600)]"
+                : disabled
+                  ? "text-[var(--text-alt-tertiary)]"
+                  : "text-[var(--icon-tertiary)]",
+            )}
+          />
+        </button>
+
+        {isOpen && mounted && createPortal(
+          <div
+            ref={menuRef}
+            dir={direction}
+            style={{ position: "fixed", top: 0, left: 0, zIndex: 50 }}
+            onKeyDown={handleMenuKeyDown}
+            className={cn(
+              "flex flex-col gap-[6px] rounded-[12px] border border-[var(--stroke-primary)] bg-[var(--surface-primary)] p-[8px] shadow-[0_8px_16px_0_rgba(0,0,0,0.12)]",
+            )}
+          >
+            {searchable && (
+              <div className="flex items-center gap-[8px] rounded-[8px] border border-[var(--stroke-primary)] bg-transparent px-[12px] py-[8px] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]">
+                <Icon
+                  name="magnifying-glass"
+                  className="h-[16px] w-[16px] shrink-0 text-[var(--icon-tertiary)]"
+                />
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search"
+                  aria-label="Search options"
+                  className="min-w-0 flex-1 bg-transparent text-[14px] leading-[20px] text-[var(--text-primary)] outline-none placeholder:text-[var(--text-tertiary)]"
+                />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery("")}
+                    aria-label="Clear search"
+                    className="inline-flex h-[16px] w-[16px] items-center justify-center rounded-[4px] text-[var(--icon-tertiary)] hover:bg-[var(--surface-alt-tertiary)] hover:text-[var(--text-primary)]"
+                  >
+                    <Icon name="x" className="h-[12px] w-[12px]" />
+                  </button>
+                )}
+              </div>
+            )}
+
+            <ul
+              role="listbox"
+              id={listboxId}
+              aria-multiselectable={multiple || undefined}
+              aria-labelledby={label ? labelId : undefined}
+              tabIndex={-1}
+              className="flex max-h-[280px] flex-col gap-[2px] overflow-y-auto"
+            >
+              {filteredOptions.length === 0 ? (
+                <li className="px-[8px] py-[10px] text-[14px] leading-[20px] text-[var(--text-tertiary)]">
+                  No results found
+                </li>
+              ) : (
+                filteredOptions.map((option, index) => {
+                  const isSelected = selectedValues.includes(option.value);
+                  const isActive = index === activeIndex;
+                  return (
+                    <li
+                      key={option.value}
+                      id={`${listboxId}-option-${index}`}
+                      role="option"
+                      aria-selected={isSelected}
+                      aria-disabled={option.disabled || undefined}
+                      onMouseEnter={() => setActiveIndex(index)}
+                      onClick={() => handleSelect(option)}
+                      className={cn(
+                        "flex cursor-pointer items-start gap-[12px] rounded-[6px] px-[8px] py-[8px] transition-colors",
+                        option.disabled && "cursor-not-allowed opacity-60",
+                        isSelected
+                          ? "bg-[var(--color-primary-100)] dark:bg-[var(--color-primary-950)]"
+                          : isActive
+                            ? "bg-[var(--surface-tertiary)]"
+                            : "bg-transparent",
+                      )}
+                    >
+                      {multiple && (
+                        <span
+                          aria-hidden
+                          className={cn(
+                            "mt-[2px] flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-[4px] border transition-colors",
+                            isSelected
+                              ? "border-[var(--color-primary-600)] bg-[var(--color-primary-600)] text-white"
+                              : "border-[var(--stroke-primary)] bg-[var(--surface-primary)]",
+                          )}
+                        >
+                          {isSelected && (
+                            <Icon name="check" className="h-[10px] w-[10px]" />
+                          )}
+                        </span>
+                      )}
+                      <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
+                        <span
+                          className={cn(
+                            "text-[14px] font-medium leading-[20px]",
+                            isSelected
+                              ? "text-[var(--color-primary-700)] dark:text-[var(--color-primary-400)]"
+                              : "text-[var(--header-primary)]",
+                          )}
+                        >
+                          {option.label}
+                        </span>
+                        {option.description && (
+                          <span
+                            className={cn(
+                              "text-[12px] leading-[16px]",
+                              isSelected
+                                ? "text-[var(--color-primary-700)] dark:text-[var(--color-primary-400)]"
+                                : "text-[var(--text-tertiary)]",
+                            )}
+                          >
+                            {option.description}
+                          </span>
+                        )}
+                      </span>
+                      {!multiple && isSelected && (
+                        <Icon
+                          name="check"
+                          className="mt-[2px] h-[16px] w-[16px] shrink-0 text-[var(--color-primary-600)]"
+                        />
+                      )}
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </div>,
+          document.body,
+        )}
+      </div>
+
+      {error ? (
+        <p
+          id={errorId}
+          role="alert"
+          className="text-[12px] leading-[16px] text-[var(--color-error-600)]"
+        >
+          {error}
+        </p>
+      ) : hint ? (
+        <p
+          id={hintId}
+          className={cn(
+            "text-[12px] leading-[16px]",
+            disabled ? "text-[var(--text-disabled)]" : "text-[var(--text-tertiary)]",
+          )}
+        >
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+});
+
+export { Dropdown };
+
+```
+
+
+### file-uploader.tsx
+
+```tsx
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Icon } from "@/components/ui/icon";
+import { cn } from "@/lib/utils";
+
+export type FileUploaderSize = "xl" | "lg" | "md" | "sm";
+export type UploadStatus = "uploading" | "uploaded" | "error";
+
+export interface UploadedFile {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  status: UploadStatus;
+  progress: number;
+  error?: string;
+}
+
+export interface FileUploaderProps {
+  size?: FileUploaderSize;
+  accept?: string;
+  multiple?: boolean;
+  maxSize?: number;
+  hint?: string;
+  disabled?: boolean;
+  dir?: "ltr" | "rtl";
+  className?: string;
+  files?: UploadedFile[];
+  defaultFiles?: UploadedFile[];
+  onFilesChange?: (files: UploadedFile[]) => void;
+  onFileSelect?: (files: File[]) => void;
+  simulateUpload?: boolean;
+}
+
+const LABELS = {
+  en: {
+    click: "Click to upload",
+    drag: " or drag and drop",
+    drop: "Drop files here",
+    upload: "Upload",
+    remove: "Remove file",
+    cancel: "Cancel upload",
+  },
+  ar: {
+    click: "انقر للرفع",
+    drag: " أو اسحب وأفلت",
+    drop: "أفلت الملفات هنا",
+    upload: "رفع",
+    remove: "إزالة الملف",
+    cancel: "إلغاء الرفع",
+  },
+} as const;
+
+function formatBytes(bytes: number): string {
+  if (!bytes) return "0 B";
+  const k = 1024;
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), units.length - 1);
+  return `${(bytes / Math.pow(k, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
+
+function getFileCategory(type: string, name: string): string {
+  const ext = name.split(".").pop()?.toLowerCase() ?? "";
+  if (type.startsWith("image/") || ["png", "jpg", "jpeg", "gif", "svg", "webp"].includes(ext))
+    return "image";
+  if (type.startsWith("video/") || ["mp4", "mov", "avi", "mkv"].includes(ext)) return "video";
+  if (type.startsWith("audio/") || ["mp3", "wav"].includes(ext)) return "audio";
+  if (ext === "pdf") return "pdf";
+  if (["doc", "docx"].includes(ext)) return "doc";
+  if (["xls", "xlsx", "csv"].includes(ext)) return "sheet";
+  if (["ppt", "pptx"].includes(ext)) return "slides";
+  if (["zip", "rar", "7z"].includes(ext)) return "archive";
+  if (["js", "ts", "tsx", "jsx", "html", "css", "json", "xml", "java", "py"].includes(ext))
+    return "code";
+  return "file";
+}
+
+function getFileIcon(category: string): string {
+  switch (category) {
+    case "image":
+      return "file-image";
+    case "video":
+      return "file-video";
+    case "audio":
+      return "file-audio";
+    case "pdf":
+      return "file-pdf";
+    case "doc":
+      return "file-doc";
+    case "sheet":
+      return "file-xls";
+    case "slides":
+      return "file-ppt";
+    case "archive":
+      return "file-zip";
+    case "code":
+      return "file-code";
+    default:
+      return "file";
+  }
+}
+
+function getCategoryColor(category: string): string {
+  switch (category) {
+    case "image":
+      return "#7C3AED";
+    case "video":
+      return "#DB2777";
+    case "audio":
+      return "#A855F7";
+    case "pdf":
+      return "#DC2626";
+    case "doc":
+      return "#2463EB";
+    case "sheet":
+      return "#158C4E";
+    case "slides":
+      return "#EA580C";
+    case "archive":
+      return "#6B7280";
+    case "code":
+      return "#0891B2";
+    default:
+      return "#6B7280";
+  }
+}
+
+function getCategoryLabel(category: string, isAr: boolean): string {
+  if (isAr) {
+    switch (category) {
+      case "image":
+        return "صورة";
+      case "video":
+        return "فيديو";
+      case "audio":
+        return "صوت";
+      case "pdf":
+        return "مستند PDF";
+      case "doc":
+        return "مستند Word";
+      case "sheet":
+        return "جدول بيانات";
+      case "slides":
+        return "عرض تقديمي";
+      case "archive":
+        return "ملف مضغوط";
+      case "code":
+        return "ملف كود";
+      default:
+        return "ملف";
+    }
+  }
+  switch (category) {
+    case "image":
+      return "Image";
+    case "video":
+      return "Video";
+    case "audio":
+      return "Audio";
+    case "pdf":
+      return "PDF document";
+    case "doc":
+      return "Word document";
+    case "sheet":
+      return "Spreadsheet";
+    case "slides":
+      return "Presentation";
+    case "archive":
+      return "Archive";
+    case "code":
+      return "Code file";
+    default:
+      return "File";
+  }
+}
+
+function ProgressRing({
+  size = 32,
+  strokeWidth = 3,
+}: {
+  size?: number;
+  strokeWidth?: number;
+}) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const arcLength = circumference * 0.3;
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      className="shrink-0 animate-spin"
+      style={{ animationDuration: "1s" }}
+    >
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="var(--stroke-primary)"
+        strokeWidth={strokeWidth}
+      />
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="var(--color-primary-600)"
+        strokeWidth={strokeWidth}
+        strokeDasharray={`${arcLength} ${circumference - arcLength}`}
+        strokeLinecap="round"
+        transform={`rotate(-90 ${size / 2} ${size / 2})`}
+      />
+    </svg>
+  );
+}
+
+export interface UploadItemProps {
+  file: UploadedFile;
+  onRemove?: (id: string) => void;
+  dir?: "ltr" | "rtl";
+  className?: string;
+}
+
+export function UploadItem({ file, onRemove, dir = "ltr", className }: UploadItemProps) {
+  const isAr = dir === "rtl";
+  const labels = isAr ? LABELS.ar : LABELS.en;
+  const category = getFileCategory(file.type, file.name);
+  const color = getCategoryColor(category);
+  const iconName = getFileIcon(category);
+  const isUploading = file.status === "uploading";
+  const isError = file.status === "error";
+  const subtext = isError
+    ? file.error || (isAr ? "فشل الرفع" : "Upload failed")
+    : getCategoryLabel(category, isAr);
+
+  return (
+    <div
+      dir={dir}
+      className={cn(
+        "flex w-[280px] items-center rounded-[12px] border border-[var(--stroke-primary)] bg-[var(--surface-primary)] p-[8px]",
+        isUploading ? "gap-[12px]" : "gap-[8px]",
+        isError && "border-[var(--color-error-600)]",
+        className
+      )}
+    >
+      {isUploading ? (
+        <ProgressRing size={32} />
+      ) : (
+        <div
+          className="flex size-[36px] shrink-0 items-center justify-center rounded-[8px] text-white"
+          style={{ backgroundColor: isError ? "var(--color-error-600)" : color }}
+        >
+          <Icon name={iconName} className="size-[20px]" />
+        </div>
+      )}
+      <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
+        <p
+          className={cn(
+            "truncate text-[14px] font-medium leading-[20px]",
+            isError ? "text-[var(--color-error-600)]" : "text-[var(--header-primary)]"
+          )}
+        >
+          {file.name}
+        </p>
+        <p
+          className={cn(
+            "truncate text-[12px] leading-[16px]",
+            isError ? "text-[var(--color-error-600)]" : "text-[var(--text-tertiary)]"
+          )}
+        >
+          {subtext}
+        </p>
+      </div>
+      {onRemove && (
+        <button
+          type="button"
+          onClick={() => onRemove(file.id)}
+          aria-label={isUploading ? labels.cancel : labels.remove}
+          className="flex size-[20px] shrink-0 items-center justify-center text-[var(--text-tertiary)] transition-colors hover:text-[var(--header-primary)]"
+        >
+          <Icon name="xcircle" className="size-[20px]" />
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function FileUploader({
+  size = "xl",
+  accept,
+  multiple = false,
+  maxSize,
+  hint,
+  disabled = false,
+  dir = "ltr",
+  className,
+  files: controlledFiles,
+  defaultFiles,
+  onFilesChange,
+  onFileSelect,
+  simulateUpload = true,
+}: FileUploaderProps) {
+  const inputId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [internalFiles, setInternalFiles] = useState<UploadedFile[]>(defaultFiles ?? []);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragCounter = useRef(0);
+  const isControlled = controlledFiles !== undefined;
+  const files = isControlled ? controlledFiles! : internalFiles;
+  const isAr = dir === "rtl";
+  const labels = isAr ? LABELS.ar : LABELS.en;
+
+  const defaultHint = useMemo(() => {
+    if (hint) return hint;
+    const parts: string[] = [];
+    if (accept) {
+      const types = accept
+        .split(",")
+        .map((t) => t.trim().replace(/^\./, "").replace(/^image\//, "").toUpperCase())
+        .filter(Boolean)
+        .slice(0, 4);
+      if (types.length) parts.push(types.join(", "));
+    } else {
+      parts.push(isAr ? "SVG، PNG، JPG أو GIF" : "SVG, PNG, JPG or GIF");
+    }
+    if (maxSize) {
+      parts.push(
+        isAr
+          ? `(حد أقصى ${formatBytes(maxSize)})`
+          : `(max. ${formatBytes(maxSize)})`
+      );
+    }
+    return parts.join(" ");
+  }, [hint, accept, maxSize, isAr]);
+
+  const updateFiles = useCallback(
+    (next: UploadedFile[]) => {
+      if (!isControlled) setInternalFiles(next);
+      onFilesChange?.(next);
+    },
+    [isControlled, onFilesChange]
+  );
+
+  const addFiles = useCallback(
+    (fileList: FileList | File[]) => {
+      const raw = Array.from(fileList);
+      if (!raw.length) return;
+      const accepted: File[] = [];
+      const rejected: UploadedFile[] = [];
+      for (const f of raw) {
+        if (maxSize && f.size > maxSize) {
+          rejected.push({
+            id: `${f.name}-${Date.now()}-${Math.random()}`,
+            name: f.name,
+            size: f.size,
+            type: f.type,
+            status: "error",
+            progress: 0,
+            error: isAr ? "الملف كبير جدًا" : "File too large",
+          });
+          continue;
+        }
+        accepted.push(f);
+      }
+      const accepted2: UploadedFile[] = accepted.map((f) => ({
+        id: `${f.name}-${Date.now()}-${Math.random()}`,
+        name: f.name,
+        size: f.size,
+        type: f.type,
+        status: simulateUpload ? "uploading" : "uploaded",
+        progress: simulateUpload ? 0 : 100,
+      }));
+      const base = multiple ? files : [];
+      const next = [...base, ...accepted2, ...rejected];
+      updateFiles(next);
+      onFileSelect?.(accepted);
+    },
+    [files, maxSize, multiple, simulateUpload, updateFiles, onFileSelect, isAr]
+  );
+
+  useEffect(() => {
+    if (!simulateUpload) return;
+    const timers: ReturnType<typeof setInterval>[] = [];
+    files.forEach((f) => {
+      if (f.status !== "uploading") return;
+      const timer = setInterval(() => {
+        const current = isControlled ? controlledFiles! : internalFiles;
+        const target = current.find((x) => x.id === f.id);
+        if (!target || target.status !== "uploading") {
+          clearInterval(timer);
+          return;
+        }
+        const nextProgress = Math.min(100, target.progress + 12);
+        const nextStatus: UploadStatus = nextProgress >= 100 ? "uploaded" : "uploading";
+        const next = current.map((x) =>
+          x.id === f.id ? { ...x, progress: nextProgress, status: nextStatus } : x
+        );
+        updateFiles(next);
+        if (nextStatus === "uploaded") clearInterval(timer);
+      }, 300);
+      timers.push(timer);
+    });
+    return () => {
+      timers.forEach((t) => clearInterval(t));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [files.map((f) => `${f.id}:${f.status}`).join(",")]);
+
+  const handleRemove = useCallback(
+    (id: string) => {
+      updateFiles(files.filter((f) => f.id !== id));
+    },
+    [files, updateFiles]
+  );
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (disabled) return;
+    dragCounter.current += 1;
+    if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+      setIsDragging(true);
+    }
+  };
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dragCounter.current -= 1;
+    if (dragCounter.current <= 0) {
+      dragCounter.current = 0;
+      setIsDragging(false);
+    }
+  };
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (disabled) return;
+    setIsDragging(false);
+    dragCounter.current = 0;
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      addFiles(e.dataTransfer.files);
+      e.dataTransfer.clearData();
+    }
+  };
+
+  const containerHeight = {
+    xl: "h-[108px]",
+    lg: "h-[64px]",
+    md: "h-[36px]",
+    sm: "h-[28px]",
+  }[size];
+
+  const containerPadding = {
+    xl: "px-[16px] py-[12px]",
+    lg: "px-[12px] py-[12px]",
+    md: "px-[12px] py-[6px]",
+    sm: "px-[8px] py-[4px]",
+  }[size];
+
+  const rootRadius = size === "md" || size === "sm" ? "rounded-[8px]" : "rounded-[12px]";
+
+  const openPicker = () => {
+    if (disabled) return;
+    inputRef.current?.click();
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (disabled) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      openPicker();
+    }
+  };
+
+  const renderDropzone = () => {
+    const active = isDragging && !disabled;
+    const borderClasses = active
+      ? "border-solid border-[var(--color-primary-600)]"
+      : "border-dashed border-[var(--stroke-primary)]";
+    const bgClasses = active
+      ? "bg-[var(--color-primary-50)] dark:bg-[color-mix(in_srgb,var(--color-primary-600)_14%,transparent)]"
+      : disabled
+        ? "bg-[var(--surface-disabled)]"
+        : "";
+    const cursor = disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer";
+
+    if (size === "xl") {
+      return (
+        <div
+          role="button"
+          tabIndex={disabled ? -1 : 0}
+          aria-disabled={disabled}
+          aria-label={labels.click}
+          onClick={openPicker}
+          onKeyDown={onKeyDown}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className={cn(
+            "flex w-full flex-col items-center justify-center gap-[4px] border outline-none transition-colors",
+            "focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-primary)]",
+            containerHeight,
+            containerPadding,
+            rootRadius,
+            borderClasses,
+            bgClasses,
+            cursor
+          )}
+        >
+          <div
+            className={cn(
+              "flex size-[40px] items-center justify-center rounded-[8px] border border-[var(--stroke-primary)]",
+              active && "border-[var(--color-primary-600)] text-[var(--color-primary-600)]"
+            )}
+            style={{ color: active ? undefined : "var(--text-tertiary)" }}
+          >
+            <Icon name="cloud-arrow-up" className="size-[24px]" />
+          </div>
+          <div className="flex items-center gap-[4px] text-[14px] leading-[20px]">
+            {active ? (
+              <span className="font-medium text-[var(--color-primary-600)]">{labels.drop}</span>
+            ) : (
+              <>
+                <span className="font-medium text-[var(--color-primary-600)]">{labels.click}</span>
+                <span className="text-[var(--header-primary)]">{labels.drag}</span>
+              </>
+            )}
+          </div>
+          {!active && defaultHint && (
+            <p className="text-[12px] leading-[16px] text-[var(--text-tertiary)]">{defaultHint}</p>
+          )}
+        </div>
+      );
+    }
+
+    if (size === "lg") {
+      return (
+        <div
+          role="button"
+          tabIndex={disabled ? -1 : 0}
+          aria-disabled={disabled}
+          aria-label={labels.click}
+          onClick={openPicker}
+          onKeyDown={onKeyDown}
+          onDragEnter={handleDragEnter}
+          onDragLeave={handleDragLeave}
+          onDragOver={handleDragOver}
+          onDrop={handleDrop}
+          className={cn(
+            "flex w-full items-center gap-[12px] border outline-none transition-colors",
+            "focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-primary)]",
+            containerHeight,
+            containerPadding,
+            rootRadius,
+            borderClasses,
+            bgClasses,
+            cursor
+          )}
+        >
+          <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
+            <div className="flex items-center gap-[4px] text-[14px] leading-[20px]">
+              {active ? (
+                <span className="font-medium text-[var(--color-primary-600)]">{labels.drop}</span>
+              ) : (
+                <>
+                  <span className="font-medium text-[var(--color-primary-600)]">{labels.click}</span>
+                  <span className="text-[var(--header-primary)]">{labels.drag}</span>
+                </>
+              )}
+            </div>
+            {!active && defaultHint && (
+              <p className="truncate text-[12px] leading-[16px] text-[var(--text-tertiary)]">
+                {defaultHint}
+              </p>
+            )}
+          </div>
+          <div
+            className={cn(
+              "flex size-[40px] shrink-0 items-center justify-center rounded-[8px] border border-[var(--stroke-primary)]",
+              active && "border-[var(--color-primary-600)] text-[var(--color-primary-600)]"
+            )}
+            style={{ color: active ? undefined : "var(--text-tertiary)" }}
+          >
+            <Icon name="cloud-arrow-up" className="size-[20px]" />
+          </div>
+        </div>
+      );
+    }
+
+    const iconSize = size === "md" ? "size-[16px]" : "size-[14px]";
+    const textSize = size === "md" ? "text-[14px] leading-[20px]" : "text-[12px] leading-[16px]";
+
+    return (
+      <div
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled}
+        aria-label={labels.click}
+        onClick={openPicker}
+        onKeyDown={onKeyDown}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        className={cn(
+          "flex w-full items-center gap-[8px] border outline-none transition-colors",
+          "focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-primary)]",
+          containerHeight,
+          containerPadding,
+          rootRadius,
+          borderClasses,
+          bgClasses,
+          cursor
+        )}
+      >
+        <Icon
+          name="cloud-arrow-up"
+          className={cn(iconSize, "shrink-0")}
+          style={{
+            color: active ? "var(--color-primary-600)" : "var(--text-tertiary)",
+          }}
+        />
+        <div className={cn("flex min-w-0 flex-1 items-center gap-[4px] truncate", textSize)}>
+          {active ? (
+            <span className="font-medium text-[var(--color-primary-600)]">{labels.drop}</span>
+          ) : (
+            <>
+              <span className="font-medium text-[var(--color-primary-600)]">{labels.click}</span>
+              <span className="truncate text-[var(--header-primary)]">{labels.drag}</span>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div dir={dir} className={cn("flex w-full flex-col gap-[12px]", className)}>
+      <input
+        ref={inputRef}
+        id={inputId}
+        type="file"
+        accept={accept}
+        multiple={multiple}
+        disabled={disabled}
+        className="sr-only"
+        onChange={(e) => {
+          if (e.target.files) addFiles(e.target.files);
+          e.target.value = "";
+        }}
+      />
+      {renderDropzone()}
+      {files.length > 0 && (
+        <div className="flex flex-col gap-[8px]">
+          {files.map((f) => (
+            <UploadItem key={f.id} file={f} onRemove={handleRemove} dir={dir} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+```
+
+
+### icon.tsx
+
+```tsx
+"use client";
+
+import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+
+export type IconWeight =
+  | "thin"
+  | "light"
+  | "regular"
+  | "bold"
+  | "fill"
+  | "duotone";
+
+export interface IconProps {
+  name: string;
+  weight?: IconWeight;
+  className?: string;
+  style?: React.CSSProperties;
+  "aria-label"?: string;
+  "aria-hidden"?: boolean | "true" | "false";
+}
+
+// In-memory cache so we don't refetch SVGs during a session
+const svgCache = new Map<string, string>();
+
+function processSvg(raw: string): string {
+  // Make colors inherit from CSS currentColor and let CSS control size
+  return raw
+    .replace(/stroke="#[0-9a-fA-F]{3,8}"/g, 'stroke="currentColor"')
+    .replace(/fill="#[0-9a-fA-F]{3,8}"/g, 'fill="currentColor"')
+    .replace(/\swidth="[^"]*"/g, "")
+    .replace(/\sheight="[^"]*"/g, "");
+}
+
+export function Icon({
+  name,
+  weight = "regular",
+  className,
+  style,
+  "aria-label": ariaLabel,
+  "aria-hidden": ariaHidden,
+}: IconProps) {
+  const key = `${weight}/${name}`;
+  const [svg, setSvg] = useState<string | null>(svgCache.get(key) ?? null);
+
+  useEffect(() => {
+    if (svgCache.has(key)) {
+      setSvg(svgCache.get(key)!);
+      return;
+    }
+    let cancelled = false;
+    fetch(`/icons/${weight}/${name}.svg`)
+      .then((r) => r.text())
+      .then((text) => {
+        const normalized = processSvg(text);
+        svgCache.set(key, normalized);
+        if (!cancelled) setSvg(normalized);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [key, weight, name]);
+
+  return (
+    <span
+      role={ariaLabel ? "img" : undefined}
+      aria-label={ariaLabel}
+      aria-hidden={ariaLabel ? undefined : (ariaHidden ?? true)}
+      className={cn(
+        "inline-flex h-[16px] w-[16px] shrink-0 items-center justify-center [&>svg]:h-full [&>svg]:w-full",
+        className
+      )}
+      style={style}
+      dangerouslySetInnerHTML={svg ? { __html: svg } : undefined}
+    />
+  );
+}
+
+```
+
+
+### input.tsx
+
+```tsx
+"use client";
+
+import { forwardRef } from "react";
+import { cn } from "@/lib/utils";
+
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  hint?: string;
+}
+
+const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className, label, error, hint, type, id, ...props }, ref) => {
+    const inputId = id || label?.toLowerCase().replace(/\s+/g, "-");
+
+    return (
+      <div className="w-full">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="mb-[6px] block text-[14px] font-medium leading-[20px] text-[var(--text-primary)]"
+          >
+            {label}
+          </label>
+        )}
+        <input
+          type={type}
+          id={inputId}
+          className={cn(
+            "flex h-[40px] w-full rounded-[8px] border bg-transparent px-[12px] text-[14px] leading-[20px] text-[var(--text-primary)] ring-offset-[var(--surface-default)] placeholder:text-[var(--text-alt-tertiary)] transition-colors duration-200",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-[2px]",
+            "disabled:cursor-not-allowed disabled:bg-[var(--surface-disabled)] disabled:text-[var(--text-disabled)]",
+            error
+              ? "border-[var(--color-error-600)] focus-visible:ring-[var(--color-error-500)]"
+              : "border-[var(--stroke-primary)] hover:border-[var(--stroke-secondary)]",
+            className
+          )}
+          ref={ref}
+          {...props}
+        />
+        {error && (
+          <p className="mt-[6px] text-[12px] leading-[16px] text-[var(--color-error-600)]">{error}</p>
+        )}
+        {hint && !error && (
+          <p className="mt-[6px] text-[12px] leading-[16px] text-[var(--text-tertiary)]">{hint}</p>
+        )}
+      </div>
+    );
+  }
+);
+Input.displayName = "Input";
+
+export { Input };
+
+```
+
+
+### number-input.tsx
+
+```tsx
+"use client";
+
+import {
+  forwardRef,
+  useCallback,
+  useId,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+  type ClipboardEvent,
+  type KeyboardEvent,
+} from "react";
+import { cn } from "@/lib/utils";
+
+const ARABIC_DIGITS = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"] as const;
+
+function normalizeDigit(char: string): string | null {
+  if (/^[0-9]$/.test(char)) return char;
+  const arabicIndex = ARABIC_DIGITS.indexOf(char as (typeof ARABIC_DIGITS)[number]);
+  if (arabicIndex >= 0) return String(arabicIndex);
+  return null;
+}
+
+function toDisplay(value: string, direction: "ltr" | "rtl"): string {
+  if (direction !== "rtl") return value;
+  return value
+    .split("")
+    .map((ch) => (/^[0-9]$/.test(ch) ? ARABIC_DIGITS[Number(ch)] : ch))
+    .join("");
+}
+
+export interface NumberInputProps {
+  digits?: 4 | 5 | 6;
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  onComplete?: (value: string) => void;
+  direction?: "ltr" | "rtl";
+  label?: string;
+  hint?: string;
+  error?: string;
+  disabled?: boolean;
+  autoFocus?: boolean;
+  id?: string;
+  className?: string;
+  name?: string;
+  "aria-label"?: string;
+}
+
+export interface NumberInputHandle {
+  focus: () => void;
+  clear: () => void;
+}
+
+const NumberInput = forwardRef<NumberInputHandle, NumberInputProps>(function NumberInput(
+  {
+    digits = 4,
+    value: controlledValue,
+    defaultValue = "",
+    onChange,
+    onComplete,
+    direction = "ltr",
+    label,
+    hint,
+    error,
+    disabled = false,
+    autoFocus = false,
+    id,
+    className,
+    name,
+    "aria-label": ariaLabel,
+  },
+  ref,
+) {
+  const reactId = useId();
+  const groupId = id ?? `number-input-${reactId}`;
+  const labelId = `${groupId}-label`;
+  const hintId = `${groupId}-hint`;
+  const errorId = `${groupId}-error`;
+
+  const isControlled = controlledValue !== undefined;
+  const [internalValue, setInternalValue] = useState<string>(() =>
+    (defaultValue ?? "").replace(/[^0-9]/g, "").slice(0, digits),
+  );
+  const rawValue = isControlled
+    ? (controlledValue ?? "").replace(/[^0-9]/g, "").slice(0, digits)
+    : internalValue;
+
+  const cellRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      const firstEmpty = cellRefs.current.findIndex((_, i) => !rawValue[i]);
+      const target = firstEmpty === -1 ? digits - 1 : firstEmpty;
+      cellRefs.current[target]?.focus();
+    },
+    clear: () => {
+      if (!isControlled) setInternalValue("");
+      onChange?.("");
+      cellRefs.current[0]?.focus();
+    },
+  }));
+
+  const commit = useCallback(
+    (next: string) => {
+      const clamped = next.slice(0, digits);
+      if (!isControlled) setInternalValue(clamped);
+      onChange?.(clamped);
+      if (clamped.length === digits) onComplete?.(clamped);
+    },
+    [digits, isControlled, onChange, onComplete],
+  );
+
+  const focusCell = (index: number) => {
+    const target = cellRefs.current[Math.max(0, Math.min(digits - 1, index))];
+    target?.focus();
+    target?.select();
+  };
+
+  const handleChange = (index: number, raw: string) => {
+    if (!raw) return;
+    const normalized = raw
+      .split("")
+      .map(normalizeDigit)
+      .filter((d): d is string => d !== null)
+      .join("");
+    if (!normalized) return;
+
+    const chars = rawValue.padEnd(digits, " ").split("");
+    let cursor = index;
+    for (const d of normalized) {
+      if (cursor >= digits) break;
+      chars[cursor] = d;
+      cursor += 1;
+    }
+    const next = chars.join("").replace(/\s/g, "");
+    commit(next);
+    if (cursor < digits) focusCell(cursor);
+    else cellRefs.current[digits - 1]?.blur();
+  };
+
+  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>) => {
+    const isNextKey = direction === "rtl" ? "ArrowLeft" : "ArrowRight";
+    const isPrevKey = direction === "rtl" ? "ArrowRight" : "ArrowLeft";
+
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      const chars = rawValue.padEnd(digits, " ").split("");
+      if (chars[index] && chars[index] !== " ") {
+        chars[index] = " ";
+        commit(chars.join("").replace(/\s/g, ""));
+        return;
+      }
+      if (index > 0) {
+        chars[index - 1] = " ";
+        commit(chars.join("").replace(/\s/g, ""));
+        focusCell(index - 1);
+      }
+      return;
+    }
+
+    if (e.key === "Delete") {
+      e.preventDefault();
+      const chars = rawValue.padEnd(digits, " ").split("");
+      chars[index] = " ";
+      commit(chars.join("").replace(/\s/g, ""));
+      return;
+    }
+
+    if (e.key === isPrevKey) {
+      e.preventDefault();
+      focusCell(index - 1);
+      return;
+    }
+
+    if (e.key === isNextKey) {
+      e.preventDefault();
+      focusCell(index + 1);
+      return;
+    }
+
+    if (e.key === "Home") {
+      e.preventDefault();
+      focusCell(0);
+      return;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      focusCell(digits - 1);
+      return;
+    }
+  };
+
+  const handlePaste = (index: number, e: ClipboardEvent<HTMLInputElement>) => {
+    const pasted = e.clipboardData.getData("text");
+    if (!pasted) return;
+    e.preventDefault();
+    handleChange(index, pasted);
+  };
+
+  const cells = useMemo(() => Array.from({ length: digits }, (_, i) => rawValue[i] ?? ""), [
+    rawValue,
+    digits,
+  ]);
+
+  const splitAt = digits === 6 ? 3 : null;
+
+  const describedBy = [error ? errorId : null, !error && hint ? hintId : null]
+    .filter(Boolean)
+    .join(" ") || undefined;
+
+  const renderCell = (i: number) => {
+    const hasValue = Boolean(cells[i]);
+    const display = toDisplay(cells[i] ?? "", direction);
+
+    return (
+      <input
+        key={i}
+        ref={(el) => {
+          cellRefs.current[i] = el;
+        }}
+        type="text"
+        inputMode="numeric"
+        autoComplete={i === 0 ? "one-time-code" : "off"}
+        pattern="[0-9]*"
+        maxLength={1}
+        dir={direction}
+        disabled={disabled}
+        autoFocus={autoFocus && i === 0}
+        name={name ? `${name}-${i}` : undefined}
+        value={display}
+        aria-labelledby={label ? labelId : undefined}
+        aria-label={!label ? ariaLabel ?? `Digit ${i + 1} of ${digits}` : undefined}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
+        onChange={(e) => handleChange(i, e.target.value)}
+        onKeyDown={(e) => handleKeyDown(i, e)}
+        onPaste={(e) => handlePaste(i, e)}
+        onFocus={(e) => e.currentTarget.select()}
+        className={cn(
+          "h-[44px] w-[44px] rounded-[8px] border bg-transparent px-[4px] py-[2px] text-center text-[24px] font-medium leading-[32px] transition-colors duration-150",
+          "focus:outline-none focus:border-[var(--color-primary-500)] focus:shadow-[0_0_0_4px_var(--color-primary-100)]",
+          "disabled:cursor-not-allowed disabled:bg-[var(--surface-tertiary)] disabled:text-[var(--text-tertiary)]",
+          error
+            ? "border-[var(--color-error-600)] shadow-[0_0_0_4px_var(--color-error-100)] text-[var(--color-error-600)] focus:border-[var(--color-error-600)] focus:shadow-[0_0_0_4px_var(--color-error-100)]"
+            : "border-[var(--stroke-primary)]",
+          hasValue ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]",
+        )}
+      />
+    );
+  };
+
+  return (
+    <div
+      dir={direction}
+      className={cn("flex w-full max-w-[380px] flex-col gap-[6px]", className)}
+    >
+      {label && (
+        <span
+          id={labelId}
+          className="text-[14px] font-medium leading-[20px] text-[var(--text-secondary)]"
+        >
+          {label}
+        </span>
+      )}
+      <div
+        role="group"
+        aria-labelledby={label ? labelId : undefined}
+        aria-label={!label ? ariaLabel : undefined}
+        className="flex items-center gap-[8px]"
+      >
+        {splitAt
+          ? (
+            <>
+              {Array.from({ length: splitAt }, (_, i) => renderCell(i))}
+              <span
+                aria-hidden
+                className="text-[24px] font-medium leading-[32px] text-[var(--text-tertiary)]"
+              >
+                —
+              </span>
+              {Array.from({ length: digits - splitAt }, (_, i) => renderCell(i + splitAt))}
+            </>
+          )
+          : Array.from({ length: digits }, (_, i) => renderCell(i))}
+      </div>
+      {error ? (
+        <p id={errorId} role="alert" className="text-[12px] leading-[16px] text-[var(--color-error-600)]">
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={hintId} className="text-[12px] leading-[16px] text-[var(--text-tertiary)]">
+          {hint}
+        </p>
+      ) : null}
+    </div>
+  );
+});
+
+export { NumberInput };
+
+```
+
+
+### pagination.tsx
+
+```tsx
+"use client";
+
+import { forwardRef, useMemo } from "react";
+import { Icon } from "@/components/ui/icon";
+import { cn } from "@/lib/utils";
+
+export type PaginationVariant = "buttons" | "input";
+
+const numberBase =
+  "inline-flex h-[36px] min-w-[36px] select-none items-center justify-center rounded-[8px] px-[8px] text-[14px] font-medium leading-[20px] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2";
+
+function buildPageList(current: number, total: number): Array<number | "…"> {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: Array<number | "…"> = [];
+  const showLeftEllipsis = current > 4;
+  const showRightEllipsis = current < total - 3;
+  pages.push(1);
+  if (showLeftEllipsis) pages.push("…");
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+  for (let i = start; i <= end; i++) pages.push(i);
+  if (showRightEllipsis) pages.push("…");
+  pages.push(total);
+  return pages;
+}
+
+export interface PaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  variant?: PaginationVariant;
+  totalRows?: number;
+  rowsPerPage?: number;
+  onRowsPerPageChange?: (rows: number) => void;
+  rowsPerPageOptions?: number[];
+  showNavLabels?: boolean;
+  prevLabel?: string;
+  nextLabel?: string;
+  className?: string;
+  dir?: "ltr" | "rtl";
+}
+
+export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagination(
+  {
+    currentPage,
+    totalPages,
+    onPageChange,
+    variant = "buttons",
+    totalRows,
+    rowsPerPage = 20,
+    onRowsPerPageChange,
+    rowsPerPageOptions = [10, 20, 50, 100],
+    showNavLabels = true,
+    prevLabel = "Previous",
+    nextLabel = "Next",
+    className,
+    dir = "ltr",
+  },
+  ref,
+) {
+  const pages = useMemo(() => buildPageList(currentPage, totalPages), [currentPage, totalPages]);
+  const isFirst = currentPage <= 1;
+  const isLast = currentPage >= totalPages;
+  const isRtl = dir === "rtl";
+
+  const goPrev = () => {
+    if (!isFirst) onPageChange(currentPage - 1);
+  };
+  const goNext = () => {
+    if (!isLast) onPageChange(currentPage + 1);
+  };
+
+  const start =
+    totalRows && totalRows > 0 ? Math.min(totalRows, (currentPage - 1) * rowsPerPage + 1) : 0;
+  const end =
+    totalRows && totalRows > 0 ? Math.min(totalRows, currentPage * rowsPerPage) : 0;
+
+  const PrevButton = (
+    <button
+      type="button"
+      onClick={goPrev}
+      disabled={isFirst}
+      aria-label={prevLabel}
+      className={cn(
+        numberBase,
+        "gap-[8px] px-[12px] text-[var(--text-tertiary)] enabled:hover:bg-[var(--surface-alt-tertiary)] enabled:hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:bg-[var(--surface-disabled)] disabled:text-[var(--text-disabled)]",
+      )}
+    >
+      <Icon
+        name={isRtl ? "caret-right" : "caret-left"}
+        weight="bold"
+        className="h-[16px] w-[16px]"
+      />
+      {showNavLabels && <span>{prevLabel}</span>}
+    </button>
+  );
+
+  const NextButton = (
+    <button
+      type="button"
+      onClick={goNext}
+      disabled={isLast}
+      aria-label={nextLabel}
+      className={cn(
+        numberBase,
+        "gap-[8px] px-[12px] text-[var(--text-tertiary)] enabled:hover:bg-[var(--surface-alt-tertiary)] enabled:hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:bg-[var(--surface-disabled)] disabled:text-[var(--text-disabled)]",
+      )}
+    >
+      {showNavLabels && <span>{nextLabel}</span>}
+      <Icon
+        name={isRtl ? "caret-left" : "caret-right"}
+        weight="bold"
+        className="h-[16px] w-[16px]"
+      />
+    </button>
+  );
+
+  if (variant === "buttons") {
+    return (
+      <nav
+        ref={ref}
+        dir={dir}
+        aria-label="Pagination"
+        className={cn(
+          "flex w-full items-center justify-center gap-[8px] border-t border-[var(--stroke-primary)] py-[8px]",
+          className,
+        )}
+      >
+        <div className="flex min-w-0 flex-1 items-center">{PrevButton}</div>
+        <div className="flex shrink-0 items-center gap-[2px]">
+          {pages.map((p, idx) =>
+            p === "…" ? (
+              <span
+                key={`e-${idx}`}
+                aria-hidden="true"
+                className={cn(numberBase, "text-[var(--text-tertiary)]")}
+              >
+                …
+              </span>
+            ) : (
+              <button
+                key={p}
+                type="button"
+                onClick={() => onPageChange(p)}
+                aria-current={p === currentPage ? "page" : undefined}
+                aria-label={`Page ${p}`}
+                className={cn(
+                  numberBase,
+                  p === currentPage
+                    ? "bg-[var(--surface-alt-tertiary)] text-[var(--header-primary)]"
+                    : "text-[var(--text-tertiary)] hover:bg-[var(--surface-alt-tertiary)] hover:text-[var(--text-primary)]",
+                )}
+              >
+                {p}
+              </button>
+            ),
+          )}
+        </div>
+        <div className="flex min-w-0 flex-1 items-center justify-end">{NextButton}</div>
+      </nav>
+    );
+  }
+
+  return (
+    <nav
+      ref={ref}
+      dir={dir}
+      aria-label="Pagination"
+      className={cn(
+        "flex w-full items-center gap-[8px] border-t border-[var(--stroke-primary)] py-[8px]",
+        className,
+      )}
+    >
+      <div className="flex min-w-0 flex-1 items-center">
+        {totalRows !== undefined && (
+          <p className="text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)]">
+            {`Showing ${start}-${end} of ${totalRows} rows`}
+          </p>
+        )}
+      </div>
+      <div className="flex shrink-0 items-center gap-[8px]">
+        <button
+          type="button"
+          onClick={goPrev}
+          disabled={isFirst}
+          aria-label={prevLabel}
+          className={cn(
+            numberBase,
+            "w-[36px] min-w-[36px] px-0 text-[var(--text-tertiary)] enabled:hover:bg-[var(--surface-alt-tertiary)] enabled:hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:bg-[var(--surface-disabled)] disabled:text-[var(--text-disabled)]",
+          )}
+        >
+          <Icon
+            name={isRtl ? "caret-right" : "caret-left"}
+            weight="bold"
+            className="h-[16px] w-[16px]"
+          />
+        </button>
+        <div className="flex items-center gap-[6px]">
+          <input
+            type="text"
+            inputMode="numeric"
+            value={String(currentPage).padStart(2, "0")}
+            onChange={(e) => {
+              const n = parseInt(e.target.value.replace(/\D/g, ""), 10);
+              if (!Number.isNaN(n) && n >= 1 && n <= totalPages) onPageChange(n);
+            }}
+            aria-label="Current page"
+            className="h-[36px] w-[45px] rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] px-[14px] text-center text-[14px] leading-[20px] text-[var(--text-primary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)] transition-colors focus-visible:border-[var(--color-primary-500)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2"
+          />
+          <span className="whitespace-nowrap text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)]">
+            {`of ${totalPages}`}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={goNext}
+          disabled={isLast}
+          aria-label={nextLabel}
+          className={cn(
+            numberBase,
+            "w-[36px] min-w-[36px] px-0 text-[var(--text-tertiary)] enabled:hover:bg-[var(--surface-alt-tertiary)] enabled:hover:text-[var(--text-primary)] disabled:cursor-not-allowed disabled:bg-[var(--surface-disabled)] disabled:text-[var(--text-disabled)]",
+          )}
+        >
+          <Icon
+            name={isRtl ? "caret-left" : "caret-right"}
+            weight="bold"
+            className="h-[16px] w-[16px]"
+          />
+        </button>
+      </div>
+      <div className="flex min-w-0 flex-1 items-center justify-end">
+        <div className="flex items-center gap-[8px]">
+          <span className="whitespace-nowrap text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)]">
+            Rows per page
+          </span>
+          <div className="relative">
+            <select
+              value={rowsPerPage}
+              onChange={(e) => onRowsPerPageChange?.(Number(e.target.value))}
+              aria-label="Rows per page"
+              className="h-[32px] w-[66px] appearance-none rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] pl-[12px] pr-[28px] text-[14px] leading-[20px] text-[var(--text-tertiary)] shadow-[0_1px_2px_0_rgba(10,13,18,0.05)] transition-colors focus-visible:border-[var(--color-primary-500)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2"
+            >
+              {rowsPerPageOptions.map((opt) => (
+                <option key={opt} value={opt}>
+                  {opt}
+                </option>
+              ))}
+            </select>
+            <Icon
+              name="caret-down"
+              weight="bold"
+              className="pointer-events-none absolute right-[10px] top-1/2 h-[12px] w-[12px] -translate-y-1/2 text-[var(--text-tertiary)]"
+            />
+          </div>
+        </div>
+      </div>
+    </nav>
+  );
+});
+
+```
+
+
+### progress-bar.tsx
+
+```tsx
+"use client";
+
+import { cn } from "@/lib/utils";
+
+export type ProgressBarLabel = "none" | "right" | "bottom";
+
+export interface ProgressBarProps {
+  value?: number;
+  label?: ProgressBarLabel;
+  indeterminate?: boolean;
+  className?: string;
+  "aria-label"?: string;
+}
+
+export function ProgressBar({
+  value = 0,
+  label = "none",
+  indeterminate = false,
+  className,
+  "aria-label": ariaLabel = "Progress",
+}: ProgressBarProps) {
+  const clamped = Math.min(100, Math.max(0, value));
+  const pct = Math.round(clamped);
+
+  const track = (
+    <div
+      role="progressbar"
+      aria-valuenow={indeterminate ? undefined : clamped}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={ariaLabel}
+      aria-busy={indeterminate}
+      aria-valuetext={indeterminate ? "Loading" : `${pct}%`}
+      className="relative h-[8px] w-full overflow-hidden rounded-full bg-[var(--surface-alt-tertiary)]"
+    >
+      {indeterminate ? (
+        <div className="absolute top-0 h-full w-[45%] animate-[progress-indeterminate_1.6s_ease-in-out_infinite] rounded-full bg-[var(--color-primary-600)]" />
+      ) : (
+        <div
+          className="h-full rounded-full bg-[var(--color-primary-600)] transition-all duration-[var(--duration-slow)] ease-out"
+          style={{ width: `${clamped}%` }}
+        />
+      )}
+    </div>
+  );
+
+  if (label === "right") {
+    return (
+      <div className={cn("flex items-center gap-[8px]", className)}>
+        <div className="flex-1">{track}</div>
+        {!indeterminate && (
+          <span className="w-[36px] shrink-0 text-right text-[12px] font-medium leading-[16px] text-[var(--text-secondary)]">
+            {pct}%
+          </span>
+        )}
+      </div>
+    );
+  }
+
+  if (label === "bottom") {
+    return (
+      <div className={cn("flex flex-col gap-[6px]", className)}>
+        {track}
+        <span className="text-[12px] font-medium leading-[16px] text-[var(--text-secondary)]">
+          {indeterminate ? "Loading…" : `${pct}%`}
+        </span>
+      </div>
+    );
+  }
+
+  return <div className={cn(className)}>{track}</div>;
+}
+
+```
+
+
+### radio.tsx
+
+```tsx
+"use client";
+
+import {
+  createContext,
+  forwardRef,
+  useContext,
+  useId,
+  useState,
+  type ReactNode,
+} from "react";
+import { cn } from "@/lib/utils";
+
+export type RadioSize = "sm" | "md";
+
+interface RadioGroupContextValue {
+  name: string;
+  value?: string;
+  onValueChange?: (value: string) => void;
+  size: RadioSize;
+  disabled: boolean;
+}
+
+const RadioGroupContext = createContext<RadioGroupContextValue | null>(null);
+
+export interface RadioGroupProps {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  name?: string;
+  size?: RadioSize;
+  disabled?: boolean;
+  orientation?: "vertical" | "horizontal";
+  className?: string;
+  children: ReactNode;
+}
+
+export function RadioGroup({
+  value,
+  defaultValue,
+  onValueChange,
+  name,
+  size = "md",
+  disabled = false,
+  orientation = "vertical",
+  className,
+  children,
+}: RadioGroupProps) {
+  const autoName = useId();
+  const [internal, setInternal] = useState<string | undefined>(defaultValue);
+  const isControlled = value !== undefined;
+  const current = isControlled ? value : internal;
+
+  const handleChange = (next: string) => {
+    if (!isControlled) setInternal(next);
+    onValueChange?.(next);
+  };
+
+  return (
+    <RadioGroupContext.Provider
+      value={{
+        name: name ?? autoName,
+        value: current,
+        onValueChange: handleChange,
+        size,
+        disabled,
+      }}
+    >
+      <div
+        role="radiogroup"
+        className={cn(
+          "flex",
+          orientation === "vertical" ? "flex-col gap-[12px]" : "flex-row flex-wrap gap-[16px]",
+          className,
+        )}
+      >
+        {children}
+      </div>
+    </RadioGroupContext.Provider>
+  );
+}
+
+const BOX_SIZE: Record<RadioSize, string> = {
+  sm: "h-[16px] w-[16px]",
+  md: "h-[20px] w-[20px]",
+};
+
+const DOT_SIZE: Record<RadioSize, string> = {
+  sm: "h-[6px] w-[6px]",
+  md: "h-[8px] w-[8px]",
+};
+
+const LABEL_TEXT: Record<RadioSize, string> = {
+  sm: "text-[14px] leading-[20px]",
+  md: "text-[16px] leading-[24px]",
+};
+
+export interface RadioProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size" | "type" | "onChange"> {
+  value: string;
+  label?: ReactNode;
+  description?: ReactNode;
+  size?: RadioSize;
+  disabled?: boolean;
+}
+
+export const Radio = forwardRef<HTMLInputElement, RadioProps>(function Radio(
+  { value, label, description, size: sizeProp, disabled: disabledProp, className, id, ...rest },
+  ref,
+) {
+  const group = useContext(RadioGroupContext);
+  const autoId = useId();
+  const inputId = id || autoId;
+  const size = sizeProp ?? group?.size ?? "md";
+  const disabled = disabledProp ?? group?.disabled ?? false;
+  const checked = group ? group.value === value : undefined;
+  const name = group?.name;
+
+  const control = (
+    <span
+      className={cn(
+        "relative inline-flex shrink-0 items-center justify-center rounded-full border transition-colors",
+        BOX_SIZE[size],
+        disabled
+          ? "border-[var(--stroke-primary)] bg-[var(--surface-disabled)]"
+          : checked
+            ? "border-[var(--color-primary-600)] bg-[var(--color-primary-600)]"
+            : "border-[var(--stroke-primary)] bg-[var(--surface-default)] group-hover:border-[var(--color-primary-600)]",
+      )}
+      aria-hidden="true"
+    >
+      {checked && (
+        <span
+          className={cn(
+            "rounded-full",
+            DOT_SIZE[size],
+            disabled ? "bg-[var(--text-alt-tertiary)]" : "bg-white",
+          )}
+        />
+      )}
+    </span>
+  );
+
+  return (
+    <label
+      htmlFor={inputId}
+      className={cn(
+        "group inline-flex items-start gap-[8px]",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
+        className,
+      )}
+    >
+      <input
+        ref={ref}
+        id={inputId}
+        type="radio"
+        name={name}
+        value={value}
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => {
+          if (e.target.checked) group?.onValueChange?.(value);
+        }}
+        className="peer sr-only"
+        {...rest}
+      />
+      {control}
+      {(label || description) && (
+        <span className="flex min-w-0 flex-col gap-[2px]">
+          {label && (
+            <span
+              className={cn(
+                "font-medium",
+                LABEL_TEXT[size],
+                disabled ? "text-[var(--text-alt-tertiary)]" : "text-[var(--header-primary)]",
+              )}
+            >
+              {label}
+            </span>
+          )}
+          {description && (
+            <span
+              className={cn(
+                "text-[14px] font-normal leading-[20px]",
+                disabled ? "text-[var(--text-alt-tertiary)]" : "text-[var(--text-secondary)]",
+              )}
+            >
+              {description}
+            </span>
+          )}
+        </span>
+      )}
+    </label>
+  );
+});
+
+```
+
+
+### slider.tsx
+
+```tsx
+"use client";
+
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { cn } from "@/lib/utils";
+
+export type SliderLabel = "none" | "bottom" | "top-floating" | "bottom-floating";
+
+type SliderValue = number | [number, number];
+
+export interface SliderProps {
+  min?: number;
+  max?: number;
+  step?: number;
+  value?: SliderValue;
+  defaultValue?: SliderValue;
+  onValueChange?: (value: SliderValue) => void;
+  range?: boolean;
+  label?: SliderLabel;
+  formatValue?: (value: number) => string;
+  disabled?: boolean;
+  dir?: "ltr" | "rtl";
+  className?: string;
+  ariaLabel?: string;
+  ariaLabelStart?: string;
+  ariaLabelEnd?: string;
+  id?: string;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+function roundToStep(value: number, step: number, min: number): number {
+  if (step <= 0) return value;
+  const steps = Math.round((value - min) / step);
+  return min + steps * step;
+}
+
+function toArray(value: SliderValue, range: boolean): [number, number] {
+  if (Array.isArray(value)) return [value[0], value[1]];
+  return range ? [0, value] : [0, value];
+}
+
+function fromArray(values: [number, number], range: boolean): SliderValue {
+  return range ? values : values[1];
+}
+
+export function Slider({
+  min = 0,
+  max = 100,
+  step = 1,
+  value,
+  defaultValue,
+  onValueChange,
+  range = false,
+  label = "none",
+  formatValue,
+  disabled = false,
+  dir = "ltr",
+  className,
+  ariaLabel,
+  ariaLabelStart,
+  ariaLabelEnd,
+  id,
+}: SliderProps) {
+  const uid = useId();
+  const sliderId = id ?? `slider-${uid}`;
+  const trackRef = useRef<HTMLDivElement>(null);
+  const activeThumbRef = useRef<"start" | "end" | null>(null);
+  const isControlled = value !== undefined;
+
+  const initial: [number, number] = useMemo(() => {
+    const source = value ?? defaultValue ?? (range ? [min, max] : 0);
+    return toArray(source as SliderValue, range);
+  }, [value, defaultValue, range, min, max]);
+
+  const [internal, setInternal] = useState<[number, number]>(initial);
+  const current: [number, number] = isControlled
+    ? toArray(value as SliderValue, range)
+    : internal;
+
+  const isAr = dir === "rtl";
+  const format = useCallback(
+    (v: number) => (formatValue ? formatValue(v) : `${Math.round(v)}%`),
+    [formatValue]
+  );
+
+  const commit = useCallback(
+    (next: [number, number]) => {
+      if (!isControlled) setInternal(next);
+      onValueChange?.(fromArray(next, range));
+    },
+    [isControlled, onValueChange, range]
+  );
+
+  const percentFromClient = useCallback(
+    (clientX: number): number => {
+      const track = trackRef.current;
+      if (!track) return 0;
+      const rect = track.getBoundingClientRect();
+      const relative = clientX - rect.left;
+      const ratio = clamp(relative / rect.width, 0, 1);
+      const pct = isAr ? 1 - ratio : ratio;
+      return min + pct * (max - min);
+    },
+    [isAr, min, max]
+  );
+
+  const setThumb = useCallback(
+    (which: "start" | "end", rawValue: number) => {
+      const snapped = clamp(roundToStep(rawValue, step, min), min, max);
+      if (!range) {
+        if (snapped === current[1]) return;
+        commit([min, snapped]);
+        return;
+      }
+      const [start, end] = current;
+      if (which === "start") {
+        if (snapped > end) {
+          commit([end, snapped]);
+          activeThumbRef.current = "end";
+        } else {
+          commit([snapped, end]);
+        }
+      } else {
+        if (snapped < start) {
+          commit([snapped, start]);
+          activeThumbRef.current = "start";
+        } else {
+          commit([start, snapped]);
+        }
+      }
+    },
+    [step, min, max, range, current, commit]
+  );
+
+  const pickThumb = useCallback(
+    (rawValue: number): "start" | "end" => {
+      if (!range) return "end";
+      const [start, end] = current;
+      return Math.abs(rawValue - start) < Math.abs(rawValue - end)
+        ? "start"
+        : "end";
+    },
+    [range, current]
+  );
+
+  const onTrackPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (disabled) return;
+      event.preventDefault();
+      const raw = percentFromClient(event.clientX);
+      const which = pickThumb(raw);
+      activeThumbRef.current = which;
+      setThumb(which, raw);
+      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    },
+    [disabled, percentFromClient, pickThumb, setThumb]
+  );
+
+  const onTrackPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (disabled) return;
+      const which = activeThumbRef.current;
+      if (!which) return;
+      const raw = percentFromClient(event.clientX);
+      setThumb(which, raw);
+    },
+    [disabled, percentFromClient, setThumb]
+  );
+
+  const onTrackPointerUp = useCallback(() => {
+    activeThumbRef.current = null;
+  }, []);
+
+  const onThumbPointerDown = useCallback(
+    (which: "start" | "end") =>
+      (event: React.PointerEvent<HTMLButtonElement>) => {
+        if (disabled) return;
+        event.preventDefault();
+        event.stopPropagation();
+        activeThumbRef.current = which;
+        (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+      },
+    [disabled]
+  );
+
+  const onThumbPointerMove = useCallback(
+    (which: "start" | "end") =>
+      (event: React.PointerEvent<HTMLButtonElement>) => {
+        if (disabled) return;
+        if (activeThumbRef.current !== which) return;
+        const raw = percentFromClient(event.clientX);
+        setThumb(which, raw);
+      },
+    [disabled, percentFromClient, setThumb]
+  );
+
+  const onThumbPointerUp = useCallback(() => {
+    activeThumbRef.current = null;
+  }, []);
+
+  const onThumbKeyDown = useCallback(
+    (which: "start" | "end") =>
+      (event: React.KeyboardEvent<HTMLButtonElement>) => {
+        if (disabled) return;
+        const big = Math.max(step * 10, (max - min) / 10);
+        const invert = isAr ? -1 : 1;
+        const [start, end] = current;
+        const value = which === "start" ? start : end;
+        let next = value;
+        switch (event.key) {
+          case "ArrowRight":
+            next = value + step * invert;
+            break;
+          case "ArrowLeft":
+            next = value - step * invert;
+            break;
+          case "ArrowUp":
+            next = value + step;
+            break;
+          case "ArrowDown":
+            next = value - step;
+            break;
+          case "PageUp":
+            next = value + big;
+            break;
+          case "PageDown":
+            next = value - big;
+            break;
+          case "Home":
+            next = min;
+            break;
+          case "End":
+            next = max;
+            break;
+          default:
+            return;
+        }
+        event.preventDefault();
+        setThumb(which, next);
+      },
+    [disabled, step, max, min, isAr, current, setThumb]
+  );
+
+  useEffect(() => {
+    if (isControlled) return;
+    setInternal((prev) => {
+      const next: [number, number] = [
+        clamp(roundToStep(prev[0], step, min), min, max),
+        clamp(roundToStep(prev[1], step, min), min, max),
+      ];
+      if (next[0] > next[1]) next[0] = next[1];
+      if (next[0] === prev[0] && next[1] === prev[1]) return prev;
+      return next;
+    });
+  }, [isControlled, min, max, step]);
+
+  const toPct = (v: number) => ((v - min) / (max - min)) * 100;
+  const [startPct, endPct] = [toPct(current[0]), toPct(current[1])];
+  const progressStart = range ? Math.min(startPct, endPct) : 0;
+  const progressEnd = range ? Math.max(startPct, endPct) : endPct;
+  const leftOffset = (pct: number) => (isAr ? `${100 - pct}%` : `${pct}%`);
+
+  const startDisplay = format(current[0]);
+  const endDisplay = format(current[1]);
+
+  const showStaticLabels = label === "bottom";
+  const showFloating = label === "top-floating" || label === "bottom-floating";
+  const floatingOnTop = label === "top-floating";
+
+  const thumbClasses = cn(
+    "absolute top-1/2 -translate-x-1/2 -translate-y-1/2 size-[24px] rounded-full",
+    "bg-[var(--surface-primary)] border border-[var(--stroke-primary)]",
+    "shadow-[0_2px_4px_-2px_rgba(10,13,18,0.06),0_4px_8px_-2px_rgba(10,13,18,0.10)]",
+    "outline-none transition-colors",
+    !disabled && "cursor-grab active:cursor-grabbing",
+    !disabled &&
+      "hover:border-[var(--color-primary-600)] focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-tertiary)]",
+    disabled && "cursor-not-allowed opacity-60"
+  );
+
+  const renderFloatingTooltip = (text: string) => (
+    <div
+      aria-hidden="true"
+      className={cn(
+        "pointer-events-none absolute left-1/2 -translate-x-1/2 flex flex-col items-center",
+        floatingOnTop ? "bottom-[calc(100%+8px)]" : "top-[calc(100%+8px)]"
+      )}
+      style={{ filter: "drop-shadow(0 8px 16px rgba(0,0,0,0.14))" }}
+    >
+      {!floatingOnTop && (
+        <svg
+          width="16"
+          height="6"
+          viewBox="0 0 16 6"
+          className="block"
+          style={{ transform: "rotate(180deg)" }}
+        >
+          <path d="M0 6 L8 0 L16 6 Z" fill="var(--color-neutral-800)" />
+        </svg>
+      )}
+      <div className="flex items-center justify-center rounded-[6px] bg-[var(--color-neutral-800)] px-[8px] py-[6px] text-[12px] font-medium leading-[16px] text-white whitespace-nowrap">
+        {text}
+      </div>
+      {floatingOnTop && (
+        <svg width="16" height="6" viewBox="0 0 16 6" className="block">
+          <path d="M0 0 L8 6 L16 0 Z" fill="var(--color-neutral-800)" />
+        </svg>
+      )}
+    </div>
+  );
+
+  const renderThumb = (which: "start" | "end", pct: number, label: string) => {
+    const thumbValue = which === "start" ? current[0] : current[1];
+    const accessibleLabel =
+      which === "start"
+        ? ariaLabelStart ?? ariaLabel
+        : ariaLabelEnd ?? ariaLabel;
+    return (
+      <button
+        type="button"
+        role="slider"
+        aria-label={accessibleLabel}
+        aria-valuemin={min}
+        aria-valuemax={max}
+        aria-valuenow={thumbValue}
+        aria-valuetext={label}
+        aria-orientation="horizontal"
+        aria-disabled={disabled || undefined}
+        disabled={disabled}
+        tabIndex={disabled ? -1 : 0}
+        className={thumbClasses}
+        style={{ left: leftOffset(pct) }}
+        onPointerDown={onThumbPointerDown(which)}
+        onPointerMove={onThumbPointerMove(which)}
+        onPointerUp={onThumbPointerUp}
+        onPointerCancel={onThumbPointerUp}
+        onKeyDown={onThumbKeyDown(which)}
+      >
+        {showFloating && renderFloatingTooltip(label)}
+      </button>
+    );
+  };
+
+  const containerPaddingY =
+    label === "top-floating"
+      ? "pt-[44px]"
+      : label === "bottom-floating"
+        ? "pb-[44px]"
+        : label === "bottom"
+          ? "pb-[28px]"
+          : "";
+
+  return (
+    <div
+      dir={dir}
+      id={sliderId}
+      className={cn(
+        "relative w-full",
+        containerPaddingY,
+        disabled && "opacity-60",
+        className
+      )}
+    >
+      <div
+        ref={trackRef}
+        role="presentation"
+        className={cn(
+          "relative h-[24px] w-full select-none",
+          disabled ? "cursor-not-allowed" : "cursor-pointer"
+        )}
+        onPointerDown={onTrackPointerDown}
+        onPointerMove={onTrackPointerMove}
+        onPointerUp={onTrackPointerUp}
+        onPointerCancel={onTrackPointerUp}
+      >
+        <div
+          aria-hidden="true"
+          className="absolute left-0 right-0 top-1/2 h-[8px] -translate-y-1/2 rounded-full bg-[var(--color-neutral-300)] dark:bg-[var(--color-neutral-700)]"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute top-1/2 h-[8px] -translate-y-1/2 rounded-[4px] bg-[var(--color-primary-600)]"
+          style={{
+            left: isAr
+              ? `${100 - progressEnd}%`
+              : `${progressStart}%`,
+            right: isAr
+              ? `${progressStart}%`
+              : `${100 - progressEnd}%`,
+          }}
+        />
+        {range && renderThumb("start", startPct, startDisplay)}
+        {renderThumb("end", endPct, endDisplay)}
+      </div>
+
+      {showStaticLabels && (
+        <>
+          {range && (
+            <span
+              aria-hidden="true"
+              className="absolute top-[calc(50%+16px)] -translate-x-1/2 text-[16px] font-medium leading-[24px] text-[var(--header-primary)]"
+              style={{ left: leftOffset(startPct) }}
+            >
+              {startDisplay}
+            </span>
+          )}
+          <span
+            aria-hidden="true"
+            className="absolute top-[calc(50%+16px)] -translate-x-1/2 text-[16px] font-medium leading-[24px] text-[var(--header-primary)]"
+            style={{ left: leftOffset(endPct) }}
+          >
+            {endDisplay}
+          </span>
+        </>
+      )}
+    </div>
+  );
+}
+
+```
+
+
+### stepper.tsx
+
+```tsx
+"use client";
+
+import { cn } from "@/lib/utils";
+
+export type StepStatus = "complete" | "current" | "error" | "waiting";
+
+export interface StepItem {
+  label: string;
+  description?: string;
+  status: StepStatus;
+}
+
+export interface StepperProps {
+  steps: StepItem[];
+  direction?: "vertical" | "horizontal";
+  type?: "number" | "dot";
+  className?: string;
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 12 12" fill="none" className="h-[12px] w-[12px]" aria-hidden>
+      <path
+        d="M2 6l3 3 5-6"
+        stroke="white"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function XIcon() {
+  return (
+    <svg viewBox="0 0 12 12" fill="none" className="h-[12px] w-[12px]" aria-hidden>
+      <path
+        d="M2.5 2.5l7 7M9.5 2.5l-7 7"
+        stroke="white"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function StepBadge({
+  status,
+  stepNumber,
+  type,
+}: {
+  status: StepStatus;
+  stepNumber: number;
+  type: "number" | "dot";
+}) {
+  if (type === "dot") {
+    return (
+      <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center">
+        <div
+          className={cn(
+            "rounded-full transition-all duration-200",
+            status === "complete" && "h-[10px] w-[10px] bg-[var(--color-primary-600)]",
+            status === "current" &&
+              "h-[12px] w-[12px] bg-[var(--color-primary-600)] outline outline-[4px] outline-[var(--color-primary-100)]",
+            status === "error" && "h-[10px] w-[10px] bg-[var(--color-error-600)]",
+            status === "waiting" &&
+              "h-[10px] w-[10px] border-[2px] border-[var(--color-neutral-300)] bg-transparent",
+          )}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-full transition-all duration-200",
+        (status === "complete" || status === "current") && "bg-[var(--color-primary-600)]",
+        status === "error" && "bg-[var(--color-error-600)]",
+        status === "waiting" && "bg-[var(--color-neutral-100)]",
+      )}
+    >
+      {status === "complete" && <CheckIcon />}
+      {status === "current" && (
+        <span className="text-[14px] font-medium leading-[20px] text-white">
+          {stepNumber}
+        </span>
+      )}
+      {status === "error" && <XIcon />}
+      {status === "waiting" && (
+        <span className="text-[14px] font-medium leading-[20px] text-[var(--color-neutral-700)]">
+          {stepNumber}
+        </span>
+      )}
+    </div>
+  );
+}
+
+export function Stepper({
+  steps,
+  direction = "vertical",
+  type = "number",
+  className,
+}: StepperProps) {
+  if (direction === "horizontal") {
+    return (
+      <div className={cn("flex w-full", className)} role="list">
+        {steps.map((step, index) => {
+          const isLast = index === steps.length - 1;
+          const connectorFilled = step.status === "complete";
+
+          return (
+            <div
+              key={index}
+              className={cn("flex flex-1 flex-col", !isLast && "min-w-0")}
+              role="listitem"
+              aria-current={step.status === "current" ? "step" : undefined}
+            >
+              <div className="flex items-center pr-[6px]">
+                <StepBadge status={step.status} stepNumber={index + 1} type={type} />
+                {!isLast && (
+                  <div
+                    className={cn(
+                      "h-[2px] flex-1 transition-colors duration-300",
+                      connectorFilled
+                        ? "bg-[var(--color-primary-600)]"
+                        : "bg-[var(--color-neutral-200)]",
+                    )}
+                  />
+                )}
+              </div>
+              <div className="mt-[8px]">
+                <p
+                  className={cn(
+                    "text-[14px] font-medium leading-[20px] transition-colors duration-200",
+                    step.status === "current"
+                      ? "text-[var(--color-primary-900)]"
+                      : "text-[var(--color-neutral-950)]",
+                  )}
+                >
+                  {step.label}
+                </p>
+                {step.description && (
+                  <p
+                    className={cn(
+                      "text-[14px] leading-[20px] transition-colors duration-200",
+                      step.status === "current"
+                        ? "text-[var(--color-primary-700)]"
+                        : "text-[var(--color-neutral-700)]",
+                    )}
+                  >
+                    {step.description}
+                  </p>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("flex flex-col", className)} role="list">
+      {steps.map((step, index) => {
+        const isLast = index === steps.length - 1;
+        const connectorFilled = step.status === "complete";
+
+        return (
+          <div
+            key={index}
+            className="flex items-start gap-[12px]"
+            role="listitem"
+            aria-current={step.status === "current" ? "step" : undefined}
+          >
+            <div className="flex shrink-0 flex-col items-center gap-[6px] self-stretch pb-[6px]">
+              <StepBadge status={step.status} stepNumber={index + 1} type={type} />
+              {!isLast && (
+                <div
+                  className={cn(
+                    "w-[2px] min-h-[16px] flex-1 rounded-full transition-colors duration-300",
+                    connectorFilled
+                      ? "bg-[var(--color-primary-600)]"
+                      : "bg-[var(--color-neutral-200)]",
+                  )}
+                />
+              )}
+            </div>
+            <div className={cn("flex flex-col pt-[4px]", !isLast && "pb-[24px]")}>
+              <p
+                className={cn(
+                  "text-[14px] font-medium leading-[20px] transition-colors duration-200",
+                  step.status === "current"
+                    ? "text-[var(--color-primary-900)]"
+                    : "text-[var(--color-neutral-950)]",
+                )}
+              >
+                {step.label}
+              </p>
+              {step.description && (
+                <p
+                  className={cn(
+                    "text-[14px] leading-[20px] transition-colors duration-200",
+                    step.status === "current"
+                      ? "text-[var(--color-primary-700)]"
+                      : "text-[var(--color-neutral-700)]",
+                  )}
+                >
+                  {step.description}
+                </p>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+```
+
+
+### tabs.tsx
+
+```tsx
+"use client";
+
+import { forwardRef, useLayoutEffect, useRef, useState } from "react";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { cn } from "@/lib/utils";
+
+const Tabs = TabsPrimitive.Root;
+
+const TabsList = forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
+>(({ className, children, ...props }, ref) => {
+  const listRef = useRef<HTMLDivElement>(null);
+  const [pill, setPill] = useState<{ x: number; w: number; h: number; visible: boolean }>({
+    x: 0,
+    w: 0,
+    h: 0,
+    visible: false,
+  });
+
+  const setRefs = (node: HTMLDivElement | null) => {
+    listRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+  };
+
+  useLayoutEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+
+    const measure = () => {
+      const active = list.querySelector<HTMLElement>('[role="tab"][data-state="active"]');
+      if (!active) {
+        setPill((p) => ({ ...p, visible: false }));
+        return;
+      }
+      const listRect = list.getBoundingClientRect();
+      const rect = active.getBoundingClientRect();
+      setPill({
+        x: rect.left - listRect.left,
+        w: rect.width,
+        h: rect.height,
+        visible: true,
+      });
+    };
+
+    measure();
+
+    const mo = new MutationObserver(measure);
+    mo.observe(list, {
+      attributes: true,
+      attributeFilter: ["data-state"],
+      subtree: true,
+    });
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(list);
+    list
+      .querySelectorAll<HTMLElement>('[role="tab"]')
+      .forEach((el) => ro.observe(el));
+
+    window.addEventListener("resize", measure);
+    return () => {
+      mo.disconnect();
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [children]);
+
+  return (
+    <TabsPrimitive.List
+      ref={setRefs}
+      className={cn(
+        "relative inline-flex items-center gap-[4px] rounded-[8px] bg-[var(--surface-alt-tertiary)] p-[4px]",
+        className
+      )}
+      {...props}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          "pointer-events-none absolute top-[4px] left-0 rounded-[6px] bg-[var(--surface-default)] shadow-[var(--shadow-elevation-1)] transition-[transform,width,opacity] duration-[250ms] ease-[var(--ease-out)]",
+          pill.visible ? "opacity-100" : "opacity-0"
+        )}
+        style={{
+          width: pill.w,
+          height: pill.h,
+          transform: `translateX(${pill.x}px)`,
+        }}
+      />
+      {children}
+    </TabsPrimitive.List>
+  );
+});
+TabsList.displayName = TabsPrimitive.List.displayName;
+
+const TabsTrigger = forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "relative z-[1] inline-flex h-[28px] items-center justify-center rounded-[6px] px-[12px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200 ease-[var(--ease-out)]",
+      "hover:text-[var(--text-primary)]",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
+      "disabled:pointer-events-none disabled:text-[var(--text-disabled)]",
+      "data-[state=active]:text-[var(--text-primary)]",
+      className
+    )}
+    {...props}
+  />
+));
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+
+const TabsContent = forwardRef<
+  React.ComponentRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Content
+    ref={ref}
+    data-slot="tabs-content"
+    className={cn(
+      "mt-[16px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
+      className
+    )}
+    {...props}
+  />
+));
+TabsContent.displayName = TabsPrimitive.Content.displayName;
+
+export { Tabs, TabsList, TabsTrigger, TabsContent };
+
+```
+
+
+### textarea.tsx
+
+```tsx
+"use client";
+
+import { forwardRef, useId, useRef, useState, KeyboardEvent } from "react";
+import { cn } from "@/lib/utils";
+import { Icon } from "@/components/ui/icon";
+
+export type TextAreaType = "default" | "tags";
+
+export interface TextAreaProps
+  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
+  label?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  dir?: "ltr" | "rtl";
+  type?: TextAreaType;
+  tags?: string[];
+  onTagsChange?: (tags: string[]) => void;
+  onChange?: React.ChangeEventHandler<HTMLTextAreaElement>;
+}
+
+const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  (
+    {
+      className,
+      label,
+      hint,
+      error,
+      required,
+      disabled,
+      readOnly,
+      dir = "ltr",
+      type = "default",
+      tags,
+      onTagsChange,
+      id,
+      placeholder,
+      onChange,
+      ...props
+    },
+    ref
+  ) => {
+    const uid = useId();
+    const inputId = id ?? `textarea-${uid}`;
+    const isAr = dir === "rtl";
+
+    const isTagsMode = type === "tags";
+
+    if (isTagsMode) {
+      return (
+        <TagsTextArea
+          label={label}
+          hint={hint}
+          error={error}
+          required={required}
+          disabled={disabled}
+          readOnly={readOnly}
+          dir={dir}
+          tags={tags ?? []}
+          onTagsChange={onTagsChange}
+          id={inputId}
+          placeholder={placeholder ?? (isAr ? "أدخل العلامات" : "Enter tags")}
+          className={className}
+        />
+      );
+    }
+
+    const borderClass = error
+      ? "border-[var(--color-error-600)]"
+      : "border-[var(--stroke-primary)] hover:border-[var(--stroke-secondary)]";
+
+    const focusClass = error
+      ? "focus:ring-[var(--color-error-500)] focus:border-[var(--color-error-600)]"
+      : "focus:ring-[var(--color-primary-500)] focus:border-[var(--color-primary-500)]";
+
+    return (
+      <div dir={dir} className="flex w-full flex-col gap-[6px]">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)]"
+          >
+            {label}
+            {required && (
+              <span className="ml-[2px] text-[var(--color-error-600)]">*</span>
+            )}
+          </label>
+        )}
+        <div className="relative w-full">
+          <textarea
+            id={inputId}
+            ref={ref}
+            disabled={disabled}
+            readOnly={readOnly}
+            dir={dir}
+            placeholder={placeholder}
+            onChange={onChange}
+            className={cn(
+              "min-h-[128px] w-full rounded-[8px] border px-[14px] py-[10px] pb-[24px]",
+              "text-[16px] leading-[24px] text-[var(--header-primary)]",
+              "bg-transparent shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]",
+              "placeholder:text-[var(--text-tertiary)]",
+              "resize-y transition-colors duration-200",
+              "outline-none focus:ring-2 focus:ring-offset-0",
+              borderClass,
+              focusClass,
+              disabled &&
+                "cursor-not-allowed resize-none bg-[var(--surface-disabled)] text-[var(--text-disabled)] opacity-60 hover:border-[var(--stroke-primary)]",
+              readOnly &&
+                "cursor-default resize-none bg-[var(--surface-tertiary)] hover:border-[var(--stroke-primary)]",
+              className
+            )}
+            {...props}
+          />
+          {!disabled && (
+            <div
+              className={cn(
+                "pointer-events-none absolute bottom-[8px] text-[var(--text-tertiary)]",
+                isAr ? "left-[10px]" : "right-[10px]"
+              )}
+            >
+              {error ? (
+                <Icon name="info" className="size-[16px] text-[var(--color-error-600)]" />
+              ) : (
+                <Icon name="arrows-out-simple" className="size-[16px]" />
+              )}
+            </div>
+          )}
+        </div>
+        {error ? (
+          <p className="text-[14px] leading-[20px] text-[var(--color-error-600)]">
+            {error}
+          </p>
+        ) : hint ? (
+          <p className="text-[14px] leading-[20px] text-[var(--text-tertiary)]">
+            {hint}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+);
+TextArea.displayName = "TextArea";
+
+interface TagsTextAreaProps {
+  label?: string;
+  hint?: string;
+  error?: string;
+  required?: boolean;
+  disabled?: boolean;
+  readOnly?: boolean;
+  dir?: "ltr" | "rtl";
+  tags: string[];
+  onTagsChange?: (tags: string[]) => void;
+  id?: string;
+  placeholder?: string;
+  className?: string;
+}
+
+function TagsTextArea({
+  label,
+  hint,
+  error,
+  required,
+  disabled,
+  readOnly,
+  dir = "ltr",
+  tags,
+  onTagsChange,
+  id,
+  placeholder,
+  className,
+}: TagsTextAreaProps) {
+  const [inputValue, setInputValue] = useState("");
+  const [focused, setFocused] = useState(false);
+  const tagInputRef = useRef<HTMLInputElement>(null);
+  const isAr = dir === "rtl";
+
+  const addTag = (value: string) => {
+    const trimmed = value.trim().replace(/,+$/, "").trim();
+    if (!trimmed || tags.includes(trimmed)) return;
+    onTagsChange?.([...tags, trimmed]);
+    setInputValue("");
+  };
+
+  const removeTag = (index: number) => {
+    onTagsChange?.(tags.filter((_, i) => i !== index));
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag(inputValue);
+    } else if (e.key === "Backspace" && !inputValue && tags.length > 0) {
+      removeTag(tags.length - 1);
+    }
+  };
+
+  const borderClass = error
+    ? "border-[var(--color-error-600)]"
+    : focused
+      ? "border-[var(--color-primary-500)] ring-2 ring-[var(--color-primary-500)] ring-offset-0"
+      : "border-[var(--stroke-primary)] hover:border-[var(--stroke-secondary)]";
+
+  return (
+    <div dir={dir} className="flex w-full flex-col gap-[6px]">
+      {label && (
+        <label
+          htmlFor={id}
+          className="text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)]"
+        >
+          {label}
+          {required && (
+            <span className="ml-[2px] text-[var(--color-error-600)]">*</span>
+          )}
+        </label>
+      )}
+      <div
+        className={cn(
+          "relative min-h-[128px] w-full cursor-text rounded-[8px] border px-[14px] py-[10px] pb-[24px]",
+          "bg-transparent shadow-[0_1px_2px_0_rgba(10,13,18,0.05)]",
+          "transition-colors duration-200",
+          borderClass,
+          disabled && "cursor-not-allowed bg-[var(--surface-disabled)] opacity-60",
+          readOnly && "bg-[var(--surface-tertiary)]",
+          className
+        )}
+        onClick={() => !disabled && !readOnly && tagInputRef.current?.focus()}
+      >
+        <div className="flex flex-wrap gap-[6px]">
+          {tags.map((tag, i) => (
+            <span
+              key={i}
+              className="flex items-center gap-[4px] rounded-full bg-[var(--surface-tertiary)] px-[10px] py-[3px] text-[14px] leading-[20px] text-[var(--header-primary)] border border-[var(--stroke-primary)]"
+            >
+              {tag}
+              {!disabled && !readOnly && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removeTag(i);
+                  }}
+                  className="ml-[2px] text-[var(--text-tertiary)] hover:text-[var(--header-primary)] transition-colors"
+                  aria-label={`Remove ${tag}`}
+                >
+                  <Icon name="x" className="size-[12px]" />
+                </button>
+              )}
+            </span>
+          ))}
+          {!disabled && !readOnly && (
+            <input
+              ref={tagInputRef}
+              id={id}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onFocus={() => setFocused(true)}
+              onBlur={() => {
+                setFocused(false);
+                if (inputValue) addTag(inputValue);
+              }}
+              placeholder={tags.length === 0 ? placeholder : ""}
+              dir={dir}
+              className="min-w-[120px] flex-1 bg-transparent text-[16px] leading-[24px] text-[var(--header-primary)] placeholder:text-[var(--text-tertiary)] outline-none"
+            />
+          )}
+        </div>
+        {!disabled && (
+          <div
+            className={cn(
+              "pointer-events-none absolute bottom-[8px] text-[var(--text-tertiary)]",
+              isAr ? "left-[10px]" : "right-[10px]"
+            )}
+          >
+            {error ? (
+              <Icon name="info" className="size-[16px] text-[var(--color-error-600)]" />
+            ) : (
+              <Icon name="arrows-out-simple" className="size-[16px]" />
+            )}
+          </div>
+        )}
+      </div>
+      {error ? (
+        <p className="text-[14px] leading-[20px] text-[var(--color-error-600)]">{error}</p>
+      ) : hint ? (
+        <p className="text-[14px] leading-[20px] text-[var(--text-tertiary)]">{hint}</p>
+      ) : null}
+    </div>
+  );
+}
+
+export { TextArea };
+
+```
+
+
+### toast.tsx
+
+```tsx
+"use client";
+
+import { Icon } from "@/components/ui/icon";
+import { forwardRef } from "react";
+import { cn } from "@/lib/utils";
+import { cva, type VariantProps } from "class-variance-authority";
+
+const toastVariants = cva(
+  "flex items-start gap-[12px] rounded-[12px] border p-[16px] shadow-[var(--shadow-elevation-4)]",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-[var(--surface-default)] border-[var(--stroke-primary)]",
+        success:
+          "bg-[var(--color-success-50)] border-[var(--color-success-100)] dark:bg-[var(--color-success-950)] dark:border-[var(--color-success-800)]",
+        error:
+          "bg-[var(--color-error-50)] border-[var(--color-error-100)] dark:bg-[var(--color-error-950)] dark:border-[var(--color-error-800)]",
+        warning:
+          "bg-[var(--color-warning-50)] border-[var(--color-warning-100)] dark:bg-[var(--color-warning-950)] dark:border-[var(--color-warning-800)]",
+        info:
+          "bg-[var(--color-info-50)] border-[var(--color-info-100)] dark:bg-[var(--color-info-950)] dark:border-[var(--color-info-800)]",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+const variantIcons = {
+  default: <Icon name="info" className="h-[16px] w-[16px] text-[var(--icon-tertiary)]" />,
+  success: <Icon name="check" className="h-[16px] w-[16px] text-[var(--color-success-700)] dark:text-[var(--color-success-400)]" />,
+  error: <Icon name="x" className="h-[16px] w-[16px] text-[var(--color-error-700)] dark:text-[var(--color-error-400)]" />,
+  warning: <Icon name="warning" className="h-[16px] w-[16px] text-[var(--color-warning-700)] dark:text-[var(--color-warning-400)]" />,
+  info: <Icon name="info" className="h-[16px] w-[16px] text-[var(--color-info-700)] dark:text-[var(--color-info-400)]" />,
+};
+
+export interface ToastProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof toastVariants> {
+  title: string;
+  description?: string;
+  onClose?: () => void;
+}
+
+const Toast = forwardRef<HTMLDivElement, ToastProps>(
+  ({ className, variant = "default", title, description, onClose, ...props }, ref) => (
+    <div
+      ref={ref}
+      role="alert"
+      className={cn(toastVariants({ variant }), className)}
+      {...props}
+    >
+      <div className="mt-[2px]">{variantIcons[variant || "default"]}</div>
+      <div className="flex-1">
+        <p className="text-[14px] font-semibold leading-[20px] text-[var(--text-primary)]">{title}</p>
+        {description && (
+          <p className="mt-[4px] text-[12px] leading-[16px] text-[var(--text-tertiary)]">{description}</p>
+        )}
+      </div>
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="text-[var(--icon-tertiary)] hover:text-[var(--icon-secondary)] transition-colors duration-200"
+        >
+          <Icon name="x" className="h-[16px] w-[16px]" />
+          <span className="sr-only">Close</span>
+        </button>
+      )}
+    </div>
+  )
+);
+Toast.displayName = "Toast";
+
+export { Toast, toastVariants };
+
+```
+
+
+### toggle.tsx
+
+```tsx
+"use client";
+
+import { forwardRef, useId, type ReactNode } from "react";
+import { cn } from "@/lib/utils";
+
+export type ToggleSize = "sm" | "md";
+
+export interface ToggleProps
+  extends Omit<
+    React.InputHTMLAttributes<HTMLInputElement>,
+    "size" | "type" | "checked" | "defaultChecked" | "onChange"
+  > {
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  size?: ToggleSize;
+  label?: ReactNode;
+  description?: ReactNode;
+  disabled?: boolean;
+}
+
+// Figma exact dimensions — sm: 36×20px, md: 44×24px
+const TRACK_SIZE: Record<ToggleSize, string> = {
+  sm: "h-[20px] w-[36px]",
+  md: "h-[24px] w-[44px]",
+};
+
+// Thumb = track height minus 2×2px padding
+const THUMB_SIZE: Record<ToggleSize, string> = {
+  sm: "h-[16px] w-[16px]",
+  md: "h-[20px] w-[20px]",
+};
+
+// Travel = track width − thumb width − left padding − right padding
+const THUMB_ON: Record<ToggleSize, string> = {
+  sm: "translate-x-[16px]",
+  md: "translate-x-[20px]",
+};
+
+const LABEL_TEXT: Record<ToggleSize, string> = {
+  sm: "text-[14px] leading-[20px]",
+  md: "text-[16px] leading-[24px]",
+};
+
+export const Toggle = forwardRef<HTMLInputElement, ToggleProps>(function Toggle(
+  {
+    checked,
+    defaultChecked,
+    onCheckedChange,
+    size = "md",
+    label,
+    description,
+    disabled = false,
+    className,
+    id,
+    ...rest
+  },
+  ref,
+) {
+  const autoId = useId();
+  const inputId = id || autoId;
+  const isControlled = checked !== undefined;
+  const isChecked = isControlled ? !!checked : false;
+
+  return (
+    <label
+      htmlFor={inputId}
+      className={cn(
+        "group inline-flex items-start gap-[8px]",
+        disabled ? "cursor-not-allowed" : "cursor-pointer",
+        className,
+      )}
+    >
+      <input
+        ref={ref}
+        id={inputId}
+        type="checkbox"
+        role="switch"
+        checked={isControlled ? isChecked : undefined}
+        defaultChecked={!isControlled ? defaultChecked : undefined}
+        disabled={disabled}
+        onChange={(e) => onCheckedChange?.(e.target.checked)}
+        className="peer sr-only"
+        aria-checked={isChecked}
+        {...rest}
+      />
+
+      {/* Track */}
+      <span
+        className={cn(
+          "relative inline-flex shrink-0 items-center rounded-full p-[2px] transition-colors duration-[var(--duration-base)]",
+          TRACK_SIZE[size],
+          disabled
+            ? isChecked
+              ? "bg-[var(--color-primary-200)]"
+              : "bg-[var(--surface-disabled)]"
+            : isChecked
+              ? "bg-[var(--color-primary-600)] group-hover:bg-[var(--color-primary-700)]"
+              : "bg-[var(--stroke-secondary)] group-hover:bg-[var(--icon-alt-tertiary)]",
+          !disabled &&
+            "peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--color-primary-500)] peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-[var(--surface-default)]",
+        )}
+        aria-hidden="true"
+      >
+        {/* Thumb */}
+        <span
+          className={cn(
+            "inline-block shrink-0 rounded-full shadow-[var(--shadow-elevation-1)] transition-transform duration-[var(--duration-base)]",
+            THUMB_SIZE[size],
+            isChecked ? THUMB_ON[size] : "translate-x-0",
+            disabled ? "bg-[var(--color-neutral-0)]" : "bg-white",
+          )}
+        />
+      </span>
+
+      {(label || description) && (
+        <span className="flex min-w-0 flex-col gap-[2px]">
+          {label && (
+            <span
+              className={cn(
+                "font-medium",
+                LABEL_TEXT[size],
+                disabled
+                  ? "text-[var(--text-alt-tertiary)]"
+                  : "text-[var(--header-primary)]",
+              )}
+            >
+              {label}
+            </span>
+          )}
+          {description && (
+            <span
+              className={cn(
+                "text-[14px] font-normal leading-[20px]",
+                disabled
+                  ? "text-[var(--text-alt-tertiary)]"
+                  : "text-[var(--text-secondary)]",
+              )}
+            >
+              {description}
+            </span>
+          )}
+        </span>
+      )}
+    </label>
+  );
+});
+
+```
+
+
+### tooltip.tsx
+
+```tsx
+"use client";
+
+import { forwardRef } from "react";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
+import { cn } from "@/lib/utils";
+
+const TooltipProvider = TooltipPrimitive.Provider;
+const Tooltip = TooltipPrimitive.Root;
+const TooltipTrigger = TooltipPrimitive.Trigger;
+
+const TooltipContent = forwardRef<
+  React.ComponentRef<typeof TooltipPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
+>(({ className, sideOffset = 8, ...props }, ref) => (
+  <TooltipPrimitive.Portal>
+    <TooltipPrimitive.Content
+      ref={ref}
+      sideOffset={sideOffset}
+      className={cn(
+        "z-[1500] overflow-hidden rounded-[8px] bg-[var(--color-neutral-800)] px-[12px] py-[6px] text-[12px] font-medium leading-[16px] text-[var(--color-neutral-0)] shadow-[var(--shadow-elevation-3)] animate-in fade-in-0 zoom-in-95",
+        "dark:bg-[var(--color-primary-200)] dark:text-[var(--color-neutral-900)]",
+        "data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95",
+        "data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        className
+      )}
+      {...props}
+    />
+  </TooltipPrimitive.Portal>
+));
+TooltipContent.displayName = TooltipPrimitive.Content.displayName;
+
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+
+```
