@@ -1,16 +1,32 @@
 {
-  "name": "govai-mcp-server",
+  "name": "govai-mcp",
   "version": "0.1.0",
-  "description": "MCP server for the GovAI Design System — exposes Design.md, tokens, global styles, and components from GitHub for AI coding tools.",
-  "private": true,
+  "description": "MCP server for the GovAI Design System — exposes design principles, tokens, global styles, and all UI components from GitHub for AI coding tools (Claude Code, Cursor, etc.).",
   "type": "module",
   "bin": {
-    "govai-mcp": "./dist/index.js"
+    "govai-mcp": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc --watch"
+  },
+  "keywords": [
+    "mcp",
+    "design-system",
+    "govai",
+    "claude",
+    "ai"
+  ],
+  "author": "Kennedi Avelino",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kenavelino/govai-design-system.git",
+    "directory": "mcp-server"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.4.0",

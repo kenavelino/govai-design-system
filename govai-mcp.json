@@ -1,9 +1,5 @@
 {
   "mcpServers": {
-    "agentation": {
-      "command": "npx",
-      "args": ["-y", "agentation-mcp", "server"]
-    },
     "govai-design-system": {
       "command": "npx",
       "args": ["-y", "govai-mcp"]
