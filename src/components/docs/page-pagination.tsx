@@ -18,7 +18,8 @@ function flattenNavigation(): FlatItem[] {
 }
 
 export function PagePagination() {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = rawPathname.replace(/\/$/, "") || "/";
   const flat = flattenNavigation();
   const index = flat.findIndex((i) => i.href === pathname);
 
