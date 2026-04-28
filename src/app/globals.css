@@ -1,0 +1,461 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary */
+  --color-primary-950: #162B54;
+  --color-primary-900: #1D408A;
+  --color-primary-800: #1E4BAF;
+  --color-primary-700: #1D58D8;
+  --color-primary-600: #2463EB;
+  --color-primary-500: #3D78F9;
+  --color-primary-400: #6190FA;
+  --color-primary-300: #94B4FD;
+  --color-primary-200: #BFD3FE;
+  --color-primary-100: #DBE6FE;
+  --color-primary-50: #EFF4FF;
+
+  /* Purple */
+  --color-purple-950: #0D012A;
+  --color-purple-900: #190544;
+  --color-purple-800: #34098A;
+  --color-purple-700: #3C06A1;
+  --color-purple-600: #500DD6;
+  --color-purple-500: #6D1EF6;
+  --color-purple-400: #9F68FF;
+  --color-purple-300: #BD97FF;
+  --color-purple-200: #D7C0FF;
+  --color-purple-100: #DDCCFF;
+  --color-purple-50: #DDCCFF;
+
+  /* Orange */
+  --color-orange-950: #541616;
+  --color-orange-900: #8A351D;
+  --color-orange-800: #AF401E;
+  --color-orange-700: #D8491D;
+  --color-orange-600: #EB5224;
+  --color-orange-500: #F9693D;
+  --color-orange-400: #FA8761;
+  --color-orange-300: #FDAE94;
+  --color-orange-200: #FECEBF;
+  --color-orange-100: #FEE3DB;
+  --color-orange-50: #FFF3EF;
+
+  /* Violet */
+  --color-violet-900: #331E36;
+  --color-violet-800: #4D2D51;
+  --color-violet-700: #673B6B;
+  --color-violet-600: #804A86;
+  --color-violet-500: #9A59A1;
+  --color-violet-400: #AB75B1;
+  --color-violet-300: #BC90C0;
+  --color-violet-200: #CDACD0;
+  --color-violet-100: #DDC8E0;
+  --color-violet-50: #EEE3EF;
+
+  /* Indigo */
+  --color-indigo-900: #1B263F;
+  --color-indigo-800: #29395F;
+  --color-indigo-700: #374C7E;
+  --color-indigo-600: #445F9E;
+  --color-indigo-500: #4B69AD;
+  --color-indigo-400: #6F8AC8;
+  --color-indigo-300: #8CA1D3;
+  --color-indigo-200: #A9B9DE;
+  --color-indigo-100: #C5D0E9;
+  --color-indigo-50: #E2E8F4;
+
+  /* Teal */
+  --color-teal-900: #001618;
+  --color-teal-800: #002124;
+  --color-teal-700: #002B30;
+  --color-teal-600: #00363C;
+  --color-teal-500: #004148;
+  --color-teal-400: #2B6167;
+  --color-teal-300: #558085;
+  --color-teal-200: #80A0A4;
+  --color-teal-100: #AAC0C2;
+  --color-teal-50: #D5DFE1;
+
+  /* Neutrals Light */
+  --color-neutral-950: #0A0A0B;
+  --color-neutral-900: #1C1C1E;
+  --color-neutral-800: #2C2C2E;
+  --color-neutral-700: #3B3B3C;
+  --color-neutral-600: #4A4A4A;
+  --color-neutral-500: #666666;
+  --color-neutral-400: #939393;
+  --color-neutral-300: #CCCCCC;
+  --color-neutral-200: #D6D6D6;
+  --color-neutral-100: #EAEAEA;
+  --color-neutral-50: #F7F7F7;
+  --color-neutral-0: #FAFAFA;
+
+  /* Success */
+  --color-success-950: #011F09;
+  --color-success-900: #023212;
+  --color-success-800: #17633B;
+  --color-success-700: #158C4E;
+  --color-success-600: #1EAF62;
+  --color-success-500: #21C16B;
+  --color-success-400: #3DE089;
+  --color-success-300: #84EAB4;
+  --color-success-200: #C1F5DA;
+  --color-success-100: #D1FBE9;
+  --color-success-50: #E0FBEC;
+
+  /* Error */
+  --color-error-950: #25070A;
+  --color-error-900: #2D0511;
+  --color-error-800: #6A1323;
+  --color-error-700: #BA2641;
+  --color-error-600: #E12D48;
+  --color-error-500: #F03F51;
+  --color-error-400: #F66B77;
+  --color-error-300: #F89FA3;
+  --color-error-200: #FBC7CC;
+  --color-error-100: #FCE6E8;
+  --color-error-50: #FFF4F5;
+
+  /* Warning */
+  --color-warning-950: #2A1401;
+  --color-warning-900: #442605;
+  --color-warning-800: #8A5209;
+  --color-warning-700: #D9891B;
+  --color-warning-600: #E7A71A;
+  --color-warning-500: #F6B51E;
+  --color-warning-400: #FFD268;
+  --color-warning-300: #FFE097;
+  --color-warning-200: #FFECC0;
+  --color-warning-100: #FFEECC;
+  --color-warning-50: #FFFAEA;
+
+  /* Info */
+  --color-info-950: #01222A;
+  --color-info-900: #053444;
+  --color-info-800: #09658A;
+  --color-info-700: #066BA1;
+  --color-info-600: #0D8CD6;
+  --color-info-500: #1EA7F6;
+  --color-info-400: #68C8FF;
+  --color-info-300: #97D9FF;
+  --color-info-200: #C0E8FF;
+  --color-info-100: #CCEEFF;
+  --color-info-50: #EAF7FF;
+
+  /* Data Visualization */
+  --color-data-1: #4556B5;
+  --color-data-2: #3AB2C1;
+  --color-data-3: #FF7043;
+  --color-data-4: #E54440;
+  --color-data-5: #7763CF;
+  --color-data-6: #FFC821;
+  --color-data-7: #F0739D;
+  --color-data-8: #D1DC65;
+  --color-data-9: #5BC6F6;
+
+  /* Spacing — 4px base unit */
+  --spacing-0: 0px;
+  --spacing-2: 2px;
+  --spacing-4: 4px;
+  --spacing-6: 6px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-56: 56px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
+  --spacing-120: 120px;
+
+  /* Corner Radius */
+  --radius-0: 0px;
+  --radius-2: 2px;
+  --radius-4: 4px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-20: 20px;
+  --radius-full: 999px;
+
+  /* Elevation */
+  --shadow-elevation-1: 0 1px 2px 0 rgba(0,0,0,0.08);
+  --shadow-elevation-2: 0 2px 4px 0 rgba(0,0,0,0.10);
+  --shadow-elevation-3: 0 4px 8px 0 rgba(0,0,0,0.12);
+  --shadow-elevation-4: 0 8px 16px 0 rgba(0,0,0,0.14);
+  --shadow-elevation-5: 0 12px 24px 0 rgba(0,0,0,0.16);
+  --shadow-elevation-6: 0 16px 32px 0 rgba(0,0,0,0.18);
+
+  /* Strokes */
+  --border-1: 1px;
+  --border-2: 2px;
+  --border-4: 4px;
+
+  /* Font */
+  --font-sans: 'Instrument Sans', system-ui, sans-serif;
+
+  /* Motion — easing curves + durations */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast: 100ms;
+  --duration-base: 200ms;
+  --duration-slow: 300ms;
+}
+
+/* Light mode (default) — Semantic Design Palette */
+:root {
+  /* Surface */
+  --surface-default: #F7F7F7;
+  --surface-primary: #FAFAFA;
+  --surface-tertiary: #F7F7F7;
+  --surface-alt-tertiary: #EAEAEA;
+  --surface-disabled: #EAEAEA;
+  --surface-highlight: #EFF4FF;
+  --surface-modal: #FAFAFA;
+
+  /* Text */
+  --text-primary: #0A0A0B;
+  --text-secondary: #3B3B3C;
+  --text-tertiary: #666666;
+  --text-alt-tertiary: #939393;
+  --text-disabled: #D6D6D6;
+  --header-primary: #1C1C1E;
+  --header-secondary: #4A4A4A;
+  --header-disabled: #939393;
+
+  /* Icons */
+  --icon-brand: #1D58D8;
+  --icon-neutral: #1C1C1E;
+  --icon-secondary: #3B3B3C;
+  --icon-tertiary: #666666;
+  --icon-alt-tertiary: #939393;
+  --icon-disabled: #D6D6D6;
+
+  /* Strokes */
+  --stroke-primary: #D6D6D6;
+  --stroke-secondary: #D6D6D6;
+  --stroke-disabled: #D6D6D6;
+
+  /* Code */
+  --code-bg: #F7F7F7;
+  --code-border: #EAEAEA;
+
+  /* Component preview outer frame */
+  --preview-frame-bg: #F2F2F2;
+}
+
+/* Dark mode — Semantic Design Palette */
+.dark {
+  /* Surface */
+  --surface-default: #101010;
+  --surface-primary: #151515;
+  --surface-tertiary: #1C1C1C;
+  --surface-alt-tertiary: #2A2A2A;
+  --surface-disabled: #2A2A2A;
+  --surface-highlight: #162B54;
+  --surface-modal: #0A0A0B;
+
+  /* Text */
+  --text-primary: #FAFAFA;
+  --text-secondary: #BEBEBE;
+  --text-tertiary: #A8A8A8;
+  --text-alt-tertiary: #757575;
+  --text-disabled: #3F3F3F;
+  --header-primary: #EDEDED;
+  --header-secondary: #A8A8A8;
+  --header-disabled: #A8A8A8;
+
+  /* Icons */
+  --icon-brand: #3D78F9;
+  --icon-neutral: #EDEDED;
+  --icon-secondary: #BEBEBE;
+  --icon-tertiary: #757575;
+  --icon-alt-tertiary: #5B5B5B;
+  --icon-disabled: #3F3F3F;
+
+  /* Strokes */
+  --stroke-primary: #2A2A2A;
+  --stroke-secondary: #5B5B5B;
+  --stroke-disabled: #5B5B5B;
+
+  /* Code */
+  --code-bg: #1C1C1C;
+  --code-border: #2A2A2A;
+
+  /* Component preview outer frame */
+  --preview-frame-bg: #2A2A2A;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;               /* Body/16-reg */
+  line-height: 24px;             /* Body/16-reg line-height */
+  color: var(--text-primary);
+  background: var(--surface-default);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Dashed divider between docs sections — fades at both ends */
+main section[id] {
+  position: relative;
+  padding-top: 32px;
+}
+main section[id]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--stroke-primary);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Horizontal dashed divider with faded ends */
+.divider-dashed-fade {
+  position: relative;
+}
+.divider-dashed-fade::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed var(--stroke-primary);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Tab content fade-in (used by Radix Tabs) */
+@keyframes tab-content-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+[data-slot="tabs-content"][data-state="active"],
+.tab-content-fade[data-state="active"] {
+  animation: tab-content-in 200ms var(--ease-out) both;
+}
+
+/* Progress bar — indeterminate sliding animation */
+@keyframes progress-indeterminate {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(400%); }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Hide sidebar scrollbar */
+.sidebar-no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.sidebar-no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Scroll fade — solid-color gradient overlays at top/bottom based on scroll position.
+   Uses sticky-positioned pseudo-elements so the fade stays pinned to the scroll viewport
+   while content scrolls beneath. Color matches --surface-default (= neutral-50 in light mode). */
+.scroll-fade-y {
+  --fade-top: 0px;
+  --fade-bottom: 0px;
+}
+
+.scroll-fade-y::before,
+.scroll-fade-y::after {
+  content: "";
+  position: sticky;
+  left: 0;
+  right: 0;
+  display: block;
+  pointer-events: none;
+  z-index: 10;
+  transition: height 200ms var(--ease-out);
+}
+
+.scroll-fade-y::before {
+  top: 0;
+  height: var(--fade-top);
+  margin-bottom: calc(var(--fade-top) * -1);
+  background: linear-gradient(to bottom, var(--surface-default), transparent);
+}
+
+.scroll-fade-y::after {
+  bottom: 0;
+  height: var(--fade-bottom);
+  margin-top: calc(var(--fade-bottom) * -1);
+  background: linear-gradient(to top, var(--surface-default), transparent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-alt-tertiary);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+/* Code blocks — radius/12, spacing/20, Body/14-reg */
+pre {
+  background: var(--code-bg) !important;
+  border: var(--border-1) solid var(--code-border);
+  border-radius: var(--radius-12);
+  padding: var(--spacing-20);
+  overflow-x: auto;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+code {
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+  font-size: 14px;
+}
+
+/* Inline code — radius/4, spacing/2 horizontal spacing/6 */
+:not(pre) > code {
+  background: var(--code-bg);
+  border: var(--border-1) solid var(--code-border);
+  border-radius: var(--radius-4);
+  padding: var(--spacing-2) var(--spacing-6);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-primary-700);
+}
+
+.dark :not(pre) > code {
+  color: var(--color-primary-400);
+}
