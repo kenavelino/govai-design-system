@@ -1,0 +1,196 @@
+================================================================
+  GovAI Design System — Team Usage Guide
+  Version 0.1.0 | Owner: Kennedi Avelino, DGE
+================================================================
+
+This guide explains how to plug the GovAI Design System into any
+AI coding tool so that every UI you generate is consistent,
+on-brand, and follows our design standards automatically.
+
+----------------------------------------------------------------
+  LINKS
+----------------------------------------------------------------
+
+  GitHub Repo       https://github.com/kenavelino/govai-design-system
+  Live Docs         https://govai-design-system.kennediavelinowork.workers.dev
+  npm Package       https://www.npmjs.com/package/govai-mcp
+  Full Bundle       https://raw.githubusercontent.com/kenavelino/govai-design-system/main/govai-design-bundle.md
+  Design Rules      https://raw.githubusercontent.com/kenavelino/govai-design-system/main/Design.md
+  Tokens            https://raw.githubusercontent.com/kenavelino/govai-design-system/main/src/lib/tokens.ts
+  Global Styles     https://raw.githubusercontent.com/kenavelino/govai-design-system/main/src/app/globals.css
+
+----------------------------------------------------------------
+  OPTION 1 — CLAUDE CODE (Recommended)
+----------------------------------------------------------------
+
+This is the best way. The MCP server connects Claude directly to
+the live design system. No copy-pasting needed — ever.
+
+STEP 1: Create a file called .mcp.json in your project root.
+
+  NOTE: Mac Finder won't let you create files starting with a dot.
+  Ask Claude Code to create it for you by saying:
+  "Create a .mcp.json with the govai-mcp server"
+
+  OR copy the file govai-mcp.json from the design system repo
+  and run this in Terminal:
+    mv govai-mcp.json .mcp.json
+
+STEP 2: Paste this into the .mcp.json file:
+
+  {
+    "mcpServers": {
+      "govai-design-system": {
+        "command": "npx",
+        "args": ["-y", "govai-mcp"]
+      }
+    }
+  }
+
+  If your project already has a .mcp.json, add the
+  "govai-design-system" block inside the existing
+  "mcpServers" section.
+
+STEP 3: Restart Claude Code in your project.
+
+That's it. Claude will automatically:
+  - Load the design principles before generating any UI
+  - Use the correct tokens, colors, spacing, and radius
+  - Use the right component (Button, Input, Card, etc.)
+  - Apply light and dark mode correctly
+  - Follow all accessibility rules
+
+The MCP server auto-detects new components — when a new
+component is added to the repo and pushed to GitHub, Claude
+picks it up on the next session with no updates needed.
+
+----------------------------------------------------------------
+  OPTION 2 — GOOGLE AI STUDIO / GEMINI
+----------------------------------------------------------------
+
+STEP 1: Open the full bundle URL in your browser:
+  https://raw.githubusercontent.com/kenavelino/govai-design-system/main/govai-design-bundle.md
+
+STEP 2: Select All (Cmd+A) and Copy (Cmd+C).
+
+STEP 3: In Google AI Studio:
+  - Click "System Instructions" at the top of the screen
+  - Paste the entire bundle there (Cmd+V)
+
+STEP 4: Start building. Gemini now has the full design system
+in context — all rules, tokens, colors, components, and more.
+
+  TIP: The bundle is auto-regenerated every time we push
+  updates to GitHub, so always grab the latest from the URL
+  above before starting a new project.
+
+----------------------------------------------------------------
+  OPTION 3 — CURSOR
+----------------------------------------------------------------
+
+STEP 1: Open the design rules URL in your browser:
+  https://raw.githubusercontent.com/kenavelino/govai-design-system/main/Design.md
+
+STEP 2: Copy the entire content.
+
+STEP 3: Create a file called .cursorrules in your project root
+and paste the content there.
+
+STEP 4: Cursor will automatically follow the design rules
+for every AI generation in that project.
+
+----------------------------------------------------------------
+  OPTION 4 — WINDSURF
+----------------------------------------------------------------
+
+Same as Cursor, but save the file as .windsurfrules instead.
+
+----------------------------------------------------------------
+  OPTION 5 — CHATGPT / V0 / BOLT / LOVABLE / OTHER AI TOOLS
+----------------------------------------------------------------
+
+STEP 1: Open the full bundle URL in your browser:
+  https://raw.githubusercontent.com/kenavelino/govai-design-system/main/govai-design-bundle.md
+
+STEP 2: Select All (Cmd+A) and Copy (Cmd+C).
+
+STEP 3: Paste it as the very first message in your conversation,
+or into the system prompt / instructions field if the tool
+provides one.
+
+STEP 4: Tell the AI:
+  "Use the GovAI Design System above for all UI you generate."
+
+----------------------------------------------------------------
+  QUICK REFERENCE
+----------------------------------------------------------------
+
+  Tool                  What to use
+  ─────────────────     ────────────────────────────────────────
+  Claude Code           .mcp.json (see Option 1 above)
+  Google AI Studio      Full bundle → System Instructions
+  Cursor                Design.md → .cursorrules
+  Windsurf              Design.md → .windsurfrules
+  ChatGPT / v0 / Bolt   Full bundle → first message or system prompt
+
+----------------------------------------------------------------
+  WHAT THE DESIGN SYSTEM ENFORCES
+----------------------------------------------------------------
+
+When properly connected, the AI will strictly follow:
+
+  FOUNDATIONS
+  - Typography       Instrument Sans, exact scale (px values)
+  - Colors           Semantic CSS variables only, no hex codes
+  - Spacing          4px base scale only (0,2,4,6,8,12,16,20...)
+  - Corner Radius    Token scale only (2,4,8,12,16,20,999px)
+  - Shadows          6 elevation levels via tokens
+  - Borders          Semantic stroke tokens only
+  - Z-Index          Named scale only (no magic numbers)
+  - Motion           4 durations + 4 easing curves
+  - Grid             Responsive columns/gutters per breakpoint
+  - Breakpoints      360/768/1024/1280/1440/1920px
+
+  COMPONENTS (must use, never use raw HTML equivalents)
+  - Avatar           Breadcrumb      Button          Badge
+  - Card             Checkbox        Circular Progress
+  - Data Table       Date & Time Picker              Dropdown
+  - File Uploader    Icon            Input           Number Input
+  - Pagination       Progress Bar    Radio           Slider
+  - Stepper          Tabs            Textarea        Toast
+  - Toggle           Tooltip
+
+  ICONS              Phosphor Icons via <Icon> only
+  FLAGS              GovAI flag registry only
+  LOGOS              Brand logo component only
+
+  ACCESSIBILITY
+  - WCAG 2.1 AA contrast in both light and dark mode
+  - Keyboard navigation on all interactive elements
+  - Visible focus rings (never removed)
+  - ARIA labels on all icon-only buttons
+  - RTL / Arabic layout support
+  - Minimum 32px touch targets
+
+----------------------------------------------------------------
+  KEEPING YOUR DESIGN SYSTEM UP TO DATE
+----------------------------------------------------------------
+
+The design system is a living system. When the team adds new
+components or updates rules:
+
+  Claude Code       Updates automatically on next session
+  Other tools       Re-fetch the bundle from the URL above
+                    and replace your pasted content
+
+  The govai-design-bundle.md is auto-regenerated by GitHub
+  Actions every time we push changes to the main branch.
+
+----------------------------------------------------------------
+  NEED HELP?
+----------------------------------------------------------------
+
+  Contact: Kennedi Avelino — kennedi.avelino@dge.gov.ae
+  GitHub:  https://github.com/kenavelino/govai-design-system
+
+================================================================
