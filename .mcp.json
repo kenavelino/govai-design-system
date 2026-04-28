@@ -2,11 +2,11 @@
   "mcpServers": {
     "agentation": {
       "command": "npx",
-      "args": [
-        "-y",
-        "agentation-mcp",
-        "server"
-      ]
+      "args": ["-y", "agentation-mcp", "server"]
+    },
+    "govai-design-system": {
+      "command": "node",
+      "args": ["./mcp-server/dist/index.js"]
     }
   }
 }
