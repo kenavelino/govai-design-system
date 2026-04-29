@@ -2,6 +2,8 @@
 
 import { OnThisPage } from "@/components/docs/on-this-page";
 import { CodeBlock } from "@/components/docs/code-block";
+import { DataTable } from "@/components/ui/data-table";
+import type { ColumnDef } from "@/components/ui/data-table";
 
 const tocItems = [
   { id: "overview",      title: "Overview",                  level: 2 },
@@ -115,30 +117,21 @@ export default function DevelopersPage() {
           <p className="mt-3 text-[16px] leading-[24px] text-[var(--text-secondary)]">
             The GovAI Design System is a <strong>living system</strong> — not a static npm package. It is distributed through three channels depending on which AI tool you use:
           </p>
-          <div className="mt-4 overflow-hidden rounded-[12px] border border-[var(--stroke-primary)]">
-            <table className="w-full text-[14px] leading-[20px]">
-              <thead>
-                <tr className="border-b border-[var(--stroke-primary)] bg-[var(--surface-alt-tertiary)]">
-                  <th className="px-[16px] py-[12px] text-left font-semibold text-[var(--header-primary)]">Tool</th>
-                  <th className="px-[16px] py-[12px] text-left font-semibold text-[var(--header-primary)]">Method</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { tool: "Claude Code",                method: "MCP server via .mcp.json (recommended)" },
-                  { tool: "Cursor",                     method: "Design.md → .cursorrules" },
-                  { tool: "Windsurf",                   method: "Design.md → .windsurfrules" },
-                  { tool: "ChatGPT / v0 / Bolt / Lovable", method: "Full bundle → paste as first message or system prompt" },
-                  { tool: "Google AI Studio",           method: "Full bundle → System Instructions" },
-                ].map((row, i, arr) => (
-                  <tr key={row.tool} className={i < arr.length - 1 ? "border-b border-[var(--stroke-primary)]" : ""}>
-                    <td className="px-[16px] py-[12px] font-medium text-[var(--header-primary)]">{row.tool}</td>
-                    <td className="px-[16px] py-[12px] text-[var(--text-tertiary)]">{row.method}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<{ tool: string; method: string }>
+            className="mt-4"
+            columns={[
+              { key: "tool",   header: "Tool",   width: "200px" },
+              { key: "method", header: "Method" },
+            ] satisfies ColumnDef<{ tool: string; method: string }>[]}
+            data={[
+              { tool: "Claude Code",                    method: "MCP server via .mcp.json (recommended)" },
+              { tool: "Cursor",                         method: "Design.md → .cursorrules" },
+              { tool: "Windsurf",                       method: "Design.md → .windsurfrules" },
+              { tool: "ChatGPT / v0 / Bolt / Lovable",  method: "Full bundle → paste as first message or system prompt" },
+              { tool: "Google AI Studio",               method: "Full bundle → System Instructions" },
+            ]}
+            getRowKey={(row) => row.tool}
+          />
         </section>
 
         {/* Claude Code */}
@@ -242,33 +235,31 @@ export default function DevelopersPage() {
           <p className="mt-3 text-[16px] leading-[24px] text-[var(--text-secondary)]">
             When using the MCP integration, Claude has access to these tools from the <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px]">govai-mcp</code> server:
           </p>
-          <div className="mt-4 overflow-hidden rounded-[12px] border border-[var(--stroke-primary)]">
-            <table className="w-full text-[14px] leading-[20px]">
-              <thead>
-                <tr className="border-b border-[var(--stroke-primary)] bg-[var(--surface-alt-tertiary)]">
-                  <th className="px-[16px] py-[12px] text-left font-semibold text-[var(--header-primary)]">Tool</th>
-                  <th className="px-[16px] py-[12px] text-left font-semibold text-[var(--header-primary)]">Returns</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { tool: "get_design_principles", desc: "Design.md — philosophy, foundations, component conventions, accessibility rules, and anti-patterns. Claude calls this at the start of any UI task." },
-                  { tool: "get_design_tokens",     desc: "tokens.ts — TypeScript exports for colors, typography, spacing, radius, elevation, z-index, motion, breakpoints, and grid." },
-                  { tool: "get_global_styles",     desc: "globals.css — all CSS custom properties: palette tokens (--color-*), semantic tokens (--surface-*, --text-*, --stroke-*), light + dark mode." },
-                  { tool: "list_components",       desc: "Names of all UI primitives in src/components/ui/. Claude calls this before composing UI to see what's already built." },
-                  { tool: "get_component",         desc: "Full source code of a specific component (e.g. 'button', 'badge'). Claude reads the API, variants, and styling before using it." },
-                  { tool: "get_design_bundle",     desc: "The entire system as one bundle: Design.md + tokens.ts + globals.css + every component. Used for fresh sessions in other tools." },
-                ].map((row, i, arr) => (
-                  <tr key={row.tool} className={i < arr.length - 1 ? "border-b border-[var(--stroke-primary)]" : ""}>
-                    <td className="px-[16px] py-[12px] align-top">
-                      <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[12px] text-[var(--color-primary-700)]">{row.tool}</code>
-                    </td>
-                    <td className="px-[16px] py-[12px] text-[var(--text-tertiary)]">{row.desc}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<{ tool: string; returns: string }>
+            className="mt-4"
+            columns={[
+              {
+                key: "tool",
+                header: "Tool",
+                width: "240px",
+                render: (value) => (
+                  <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[12px] text-[var(--color-primary-700)]">
+                    {String(value)}
+                  </code>
+                ),
+              },
+              { key: "returns", header: "Returns" },
+            ] satisfies ColumnDef<{ tool: string; returns: string }>[]}
+            data={[
+              { tool: "get_design_principles", returns: "Design.md — philosophy, foundations, component conventions, accessibility rules, and anti-patterns. Claude calls this at the start of any UI task." },
+              { tool: "get_design_tokens",     returns: "tokens.ts — TypeScript exports for colors, typography, spacing, radius, elevation, z-index, motion, breakpoints, and grid." },
+              { tool: "get_global_styles",     returns: "globals.css — all CSS custom properties: palette tokens (--color-*), semantic tokens (--surface-*, --text-*, --stroke-*), light + dark mode." },
+              { tool: "list_components",       returns: "Names of all UI primitives in src/components/ui/. Claude calls this before composing UI to see what's already built." },
+              { tool: "get_component",         returns: "Full source code of a specific component (e.g. 'button', 'badge'). Claude reads the API, variants, and styling before using it." },
+              { tool: "get_design_bundle",     returns: "The entire system as one bundle: Design.md + tokens.ts + globals.css + every component. Used for fresh sessions in other tools." },
+            ]}
+            getRowKey={(row) => row.tool}
+          />
         </section>
 
         {/* Design Tokens */}
