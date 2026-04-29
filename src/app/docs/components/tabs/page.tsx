@@ -7,13 +7,20 @@ import { ComponentPreview } from "@/components/docs/component-preview";
 import { PropsTable } from "@/components/docs/props-table";
 import { DoDont } from "@/components/docs/do-dont";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 
-const DEMO_TABS = ["Overview", "Analytics", "Settings", "Team"];
+const DEMO_TABS_DATA = [
+  { label: "Overview",  icon: "squares-four" },
+  { label: "Analytics", icon: "chart-bar" },
+  { label: "Settings",  icon: "gear" },
+  { label: "Team",      icon: "users" },
+];
+const DEMO_TABS = DEMO_TABS_DATA.map((t) => t.label);
 
 // ─── Line variant ────────────────────────────────────────────────────────────
-function LineTabsDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
-  const [value, setValue] = useState(tabs[0]);
+function LineTabsDemo({ tabs = DEMO_TABS_DATA, icon = false }: { tabs?: typeof DEMO_TABS_DATA; icon?: boolean }) {
+  const [value, setValue] = useState(tabs[0].label);
   const listRef = useRef<HTMLDivElement>(null);
   const [ind, setInd] = useState({ left: 0, width: 0, visible: false });
 
@@ -43,16 +50,17 @@ function LineTabsDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
       >
         {tabs.map((tab) => (
           <TabsPrimitive.Trigger
-            key={tab}
-            value={tab}
+            key={tab.label}
+            value={tab.label}
             className={cn(
-              "relative inline-flex items-center justify-center pb-[12px] pt-[8px] px-[4px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
+              "relative inline-flex items-center justify-center gap-[8px] pb-[12px] pt-[8px] px-[4px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
               "hover:text-[var(--header-primary)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
               "data-[state=active]:text-[var(--color-primary-700)] dark:data-[state=active]:text-[var(--color-primary-400)]"
             )}
           >
-            {tab}
+            {icon && <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />}
+            {tab.label}
           </TabsPrimitive.Trigger>
         ))}
         <span
@@ -69,22 +77,23 @@ function LineTabsDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
 }
 
 // ─── Rectangle · Brand variant ───────────────────────────────────────────────
-function RectBrandDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
+function RectBrandDemo({ tabs = DEMO_TABS_DATA, icon = false }: { tabs?: typeof DEMO_TABS_DATA; icon?: boolean }) {
   return (
-    <TabsPrimitive.Root defaultValue={tabs[0]}>
+    <TabsPrimitive.Root defaultValue={tabs[0].label}>
       <TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
         {tabs.map((tab) => (
           <TabsPrimitive.Trigger
-            key={tab}
-            value={tab}
+            key={tab.label}
+            value={tab.label}
             className={cn(
-              "inline-flex items-center justify-center rounded-[8px] border border-transparent px-[16px] py-[10px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
+              "inline-flex items-center justify-center gap-[8px] rounded-[8px] border border-transparent px-[16px] py-[10px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
               "hover:text-[var(--header-primary)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
               "data-[state=active]:border-[var(--color-primary-600)] data-[state=active]:bg-[var(--surface-default)] data-[state=active]:text-[var(--color-primary-700)] dark:data-[state=active]:text-[var(--color-primary-400)]"
             )}
           >
-            {tab}
+            {icon && <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />}
+            {tab.label}
           </TabsPrimitive.Trigger>
         ))}
       </TabsPrimitive.List>
@@ -93,22 +102,23 @@ function RectBrandDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
 }
 
 // ─── Rectangle · Neutral variant ─────────────────────────────────────────────
-function RectNeutralDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
+function RectNeutralDemo({ tabs = DEMO_TABS_DATA, icon = false }: { tabs?: typeof DEMO_TABS_DATA; icon?: boolean }) {
   return (
-    <TabsPrimitive.Root defaultValue={tabs[0]}>
+    <TabsPrimitive.Root defaultValue={tabs[0].label}>
       <TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)]">
         {tabs.map((tab) => (
           <TabsPrimitive.Trigger
-            key={tab}
-            value={tab}
+            key={tab.label}
+            value={tab.label}
             className={cn(
-              "inline-flex items-center justify-center rounded-[8px] border border-transparent px-[10px] py-[8px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
+              "inline-flex items-center justify-center gap-[8px] rounded-[8px] border border-transparent px-[10px] py-[8px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
               "hover:text-[var(--header-primary)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
               "data-[state=active]:border-[var(--stroke-secondary)] data-[state=active]:text-[var(--header-primary)]"
             )}
           >
-            {tab}
+            {icon && <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />}
+            {tab.label}
           </TabsPrimitive.Trigger>
         ))}
       </TabsPrimitive.List>
@@ -118,21 +128,23 @@ function RectNeutralDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
 
 // ─── Rounded · Neutral / Brand variants ──────────────────────────────────────
 function RoundedPillDemo({
-  tabs = DEMO_TABS,
+  tabs = DEMO_TABS_DATA,
   brand = false,
+  icon = false,
 }: {
-  tabs?: string[];
+  tabs?: typeof DEMO_TABS_DATA;
   brand?: boolean;
+  icon?: boolean;
 }) {
   return (
-    <TabsPrimitive.Root defaultValue={tabs[0]}>
+    <TabsPrimitive.Root defaultValue={tabs[0].label}>
       <TabsPrimitive.List className="inline-flex items-center gap-[12px]">
         {tabs.map((tab) => (
           <TabsPrimitive.Trigger
-            key={tab}
-            value={tab}
+            key={tab.label}
+            value={tab.label}
             className={cn(
-              "inline-flex items-center justify-center rounded-[999px] border px-[16px] py-[8px] text-[14px] font-medium leading-[20px] transition-colors duration-200",
+              "inline-flex items-center justify-center gap-[8px] rounded-[999px] border px-[16px] py-[8px] text-[14px] font-medium leading-[20px] transition-colors duration-200",
               "border-[var(--color-primary-100)] text-[var(--text-tertiary)]",
               "hover:text-[var(--header-primary)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
@@ -141,7 +153,8 @@ function RoundedPillDemo({
                 : "data-[state=active]:border-[var(--stroke-secondary)] data-[state=active]:text-[var(--header-primary)]"
             )}
           >
-            {tab}
+            {icon && <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />}
+            {tab.label}
           </TabsPrimitive.Trigger>
         ))}
       </TabsPrimitive.List>
@@ -150,26 +163,44 @@ function RoundedPillDemo({
 }
 
 // ─── With Shadow variant ──────────────────────────────────────────────────────
-function WithShadowDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
+function WithShadowDemo({ tabs = DEMO_TABS_DATA, icon = false }: { tabs?: typeof DEMO_TABS_DATA; icon?: boolean }) {
   return (
-    <TabsPrimitive.Root defaultValue={tabs[0]}>
+    <TabsPrimitive.Root defaultValue={tabs[0].label}>
       <TabsPrimitive.List className="inline-flex items-center rounded-[8px] bg-[var(--surface-alt-tertiary)] p-[4px] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
         {tabs.map((tab) => (
           <TabsPrimitive.Trigger
-            key={tab}
-            value={tab}
+            key={tab.label}
+            value={tab.label}
             className={cn(
-              "inline-flex items-center justify-center rounded-[8px] px-[16px] py-[8px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-all duration-200",
+              "inline-flex items-center justify-center gap-[8px] rounded-[8px] px-[16px] py-[8px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-all duration-200",
               "hover:text-[var(--header-primary)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
               "data-[state=active]:bg-[var(--surface-default)] data-[state=active]:text-[var(--header-primary)] data-[state=active]:shadow-[0px_0px_24px_0px_rgba(28,27,27,0.08)]"
             )}
           >
-            {tab}
+            {icon && <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />}
+            {tab.label}
           </TabsPrimitive.Trigger>
         ))}
       </TabsPrimitive.List>
     </TabsPrimitive.Root>
+  );
+}
+
+// ─── Both variants side-by-side helper ───────────────────────────────────────
+function WithAndWithoutIcon({ children }: { children: (icon: boolean) => React.ReactNode }) {
+  return (
+    <div className="flex w-full flex-col items-center gap-[20px]">
+      <div className="flex flex-col items-center gap-[8px]">
+        <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[var(--text-tertiary)]">Without icon</span>
+        {children(false)}
+      </div>
+      <div className="w-full border-t border-dashed border-[var(--stroke-primary)]" />
+      <div className="flex flex-col items-center gap-[8px]">
+        <span className="text-[11px] font-medium uppercase tracking-[0.06em] text-[var(--text-tertiary)]">With icon</span>
+        {children(true)}
+      </div>
+    </div>
   );
 }
 
@@ -215,15 +246,15 @@ const VARIANTS: { key: VariantKey; label: string; description: string }[] = [
   },
 ];
 
-function VariantPreview({ variant }: { variant: VariantKey }) {
+function VariantPreview({ variant, icon }: { variant: VariantKey; icon: boolean }) {
   switch (variant) {
-    case "line":             return <LineTabsDemo />;
-    case "rectangle-brand":  return <RectBrandDemo />;
-    case "rectangle-neutral":return <RectNeutralDemo />;
-    case "shadow":           return <WithShadowDemo />;
-    case "rounded-brand":    return <RoundedPillDemo brand />;
+    case "line":              return <LineTabsDemo icon={icon} />;
+    case "rectangle-brand":   return <RectBrandDemo icon={icon} />;
+    case "rectangle-neutral": return <RectNeutralDemo icon={icon} />;
+    case "shadow":            return <WithShadowDemo icon={icon} />;
+    case "rounded-brand":     return <RoundedPillDemo brand icon={icon} />;
     case "rounded-neutral":
-    default:                 return <RoundedPillDemo />;
+    default:                  return <RoundedPillDemo icon={icon} />;
   }
 }
 
@@ -254,116 +285,139 @@ const overviewCode = `import { Tabs, TabsList, TabsTrigger } from "@/components/
   </TabsList>
 </Tabs>`;
 
-const roundedNeutralCode = `<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List className="inline-flex items-center gap-[12px]">
-    {tabs.map((tab) => (
-      <TabsPrimitive.Trigger
-        key={tab}
-        value={tab}
-        className="rounded-[999px] border border-[var(--color-primary-100)] px-[16px] py-[8px]
-          text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:border-[var(--stroke-secondary)]
-          data-[state=active]:text-[var(--header-primary)]"
-      >
-        {tab}
-      </TabsPrimitive.Trigger>
-    ))}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
+const roundedNeutralCode = `// Without icon
+<TabsPrimitive.List className="inline-flex items-center gap-[12px]">
+  {tabs.map((tab) => (
+    <TabsPrimitive.Trigger
+      key={tab.label} value={tab.label}
+      className="rounded-[999px] border border-[var(--color-primary-100)] px-[16px] py-[8px]
+        text-[14px] font-medium text-[var(--text-tertiary)]
+        data-[state=active]:border-[var(--stroke-secondary)]
+        data-[state=active]:text-[var(--header-primary)]"
+    >
+      {tab.label}
+    </TabsPrimitive.Trigger>
+  ))}
+</TabsPrimitive.List>
 
-const roundedBrandCode = `<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List className="inline-flex items-center gap-[12px]">
-    {tabs.map((tab) => (
-      <TabsPrimitive.Trigger
-        key={tab}
-        value={tab}
-        className="rounded-[999px] border border-[var(--color-primary-100)] px-[16px] py-[8px]
-          text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:border-[var(--color-primary-600)]
-          data-[state=active]:text-[var(--color-primary-700)]
-          dark:data-[state=active]:text-[var(--color-primary-400)]"
-      >
-        {tab}
-      </TabsPrimitive.Trigger>
-    ))}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
+// With icon — add Icon before the label
+<TabsPrimitive.Trigger ...>
+  <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />
+  {tab.label}
+</TabsPrimitive.Trigger>`;
 
-const lineCode = `<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List className="relative inline-flex items-center gap-[16px] border-b border-[var(--stroke-primary)]">
-    {tabs.map((tab) => (
-      <TabsPrimitive.Trigger
-        key={tab}
-        value={tab}
-        className="pb-[12px] pt-[8px] px-[4px] text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:text-[var(--color-primary-700)]
-          dark:data-[state=active]:text-[var(--color-primary-400)]"
-      >
-        {tab}
-      </TabsPrimitive.Trigger>
-    ))}
-    {/* Animated 2px underline — position with transform + ResizeObserver */}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
+const roundedBrandCode = `// Without icon
+<TabsPrimitive.List className="inline-flex items-center gap-[12px]">
+  {tabs.map((tab) => (
+    <TabsPrimitive.Trigger
+      key={tab.label} value={tab.label}
+      className="rounded-[999px] border border-[var(--color-primary-100)] px-[16px] py-[8px]
+        text-[14px] font-medium text-[var(--text-tertiary)]
+        data-[state=active]:border-[var(--color-primary-600)]
+        data-[state=active]:text-[var(--color-primary-700)]"
+    >
+      {tab.label}
+    </TabsPrimitive.Trigger>
+  ))}
+</TabsPrimitive.List>
 
-const rectangleBrandCode = `<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)]
-    bg-[var(--surface-default)] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
-    {tabs.map((tab) => (
-      <TabsPrimitive.Trigger
-        key={tab}
-        value={tab}
-        className="rounded-[8px] border border-transparent px-[16px] py-[10px]
-          text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:border-[var(--color-primary-600)]
-          data-[state=active]:bg-[var(--surface-default)]
-          data-[state=active]:text-[var(--color-primary-700)]
-          dark:data-[state=active]:text-[var(--color-primary-400)]"
-      >
-        {tab}
-      </TabsPrimitive.Trigger>
-    ))}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
+// With icon — add Icon before the label
+<TabsPrimitive.Trigger ...>
+  <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />
+  {tab.label}
+</TabsPrimitive.Trigger>`;
 
-const rectangleNeutralCode = `<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)]">
-    {tabs.map((tab) => (
-      <TabsPrimitive.Trigger
-        key={tab}
-        value={tab}
-        className="rounded-[8px] border border-transparent px-[10px] py-[8px]
-          text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:border-[var(--stroke-secondary)]
-          data-[state=active]:text-[var(--header-primary)]"
-      >
-        {tab}
-      </TabsPrimitive.Trigger>
-    ))}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
+const lineCode = `// Without icon
+<TabsPrimitive.List className="relative inline-flex items-center gap-[16px] border-b border-[var(--stroke-primary)]">
+  {tabs.map((tab) => (
+    <TabsPrimitive.Trigger
+      key={tab.label} value={tab.label}
+      className="inline-flex items-center gap-[8px] pb-[12px] pt-[8px] px-[4px]
+        text-[14px] font-medium text-[var(--text-tertiary)]
+        data-[state=active]:text-[var(--color-primary-700)]"
+    >
+      {tab.label}
+    </TabsPrimitive.Trigger>
+  ))}
+  {/* Animated 2px underline — position with transform + ResizeObserver */}
+</TabsPrimitive.List>
 
-const shadowCode = `<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List className="inline-flex items-center rounded-[8px]
-    bg-[var(--surface-alt-tertiary)] p-[4px] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
-    {tabs.map((tab) => (
-      <TabsPrimitive.Trigger
-        key={tab}
-        value={tab}
-        className="rounded-[8px] px-[16px] py-[8px] text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:bg-[var(--surface-default)]
-          data-[state=active]:text-[var(--header-primary)]
-          data-[state=active]:shadow-[0px_0px_24px_0px_rgba(28,27,27,0.08)]"
-      >
-        {tab}
-      </TabsPrimitive.Trigger>
-    ))}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
+// With icon — add Icon before the label
+<TabsPrimitive.Trigger ...>
+  <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />
+  {tab.label}
+</TabsPrimitive.Trigger>`;
+
+const rectangleBrandCode = `// Without icon
+<TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)]
+  bg-[var(--surface-default)] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
+  {tabs.map((tab) => (
+    <TabsPrimitive.Trigger
+      key={tab.label} value={tab.label}
+      className="inline-flex items-center gap-[8px] rounded-[8px] border border-transparent
+        px-[16px] py-[10px] text-[14px] font-medium text-[var(--text-tertiary)]
+        data-[state=active]:border-[var(--color-primary-600)]
+        data-[state=active]:text-[var(--color-primary-700)]"
+    >
+      {tab.label}
+    </TabsPrimitive.Trigger>
+  ))}
+</TabsPrimitive.List>
+
+// With icon — add Icon before the label
+<TabsPrimitive.Trigger ...>
+  <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />
+  {tab.label}
+</TabsPrimitive.Trigger>`;
+
+const rectangleNeutralCode = `// Without icon
+<TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)]">
+  {tabs.map((tab) => (
+    <TabsPrimitive.Trigger
+      key={tab.label} value={tab.label}
+      className="inline-flex items-center gap-[8px] rounded-[8px] border border-transparent
+        px-[10px] py-[8px] text-[14px] font-medium text-[var(--text-tertiary)]
+        data-[state=active]:border-[var(--stroke-secondary)]
+        data-[state=active]:text-[var(--header-primary)]"
+    >
+      {tab.label}
+    </TabsPrimitive.Trigger>
+  ))}
+</TabsPrimitive.List>
+
+// With icon — add Icon before the label
+<TabsPrimitive.Trigger ...>
+  <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />
+  {tab.label}
+</TabsPrimitive.Trigger>`;
+
+const shadowCode = `// Without icon
+<TabsPrimitive.List className="inline-flex items-center rounded-[8px]
+  bg-[var(--surface-alt-tertiary)] p-[4px] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
+  {tabs.map((tab) => (
+    <TabsPrimitive.Trigger
+      key={tab.label} value={tab.label}
+      className="inline-flex items-center gap-[8px] rounded-[8px] px-[16px] py-[8px]
+        text-[14px] font-medium text-[var(--text-tertiary)]
+        data-[state=active]:bg-[var(--surface-default)]
+        data-[state=active]:text-[var(--header-primary)]
+        data-[state=active]:shadow-[0px_0px_24px_0px_rgba(28,27,27,0.08)]"
+    >
+      {tab.label}
+    </TabsPrimitive.Trigger>
+  ))}
+</TabsPrimitive.List>
+
+// With icon — add Icon before the label
+<TabsPrimitive.Trigger ...>
+  <Icon name={tab.icon} className="h-[20px] w-[20px] text-inherit" aria-hidden="true" />
+  {tab.label}
+</TabsPrimitive.Trigger>`;
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function TabsPage() {
   const [playgroundVariant, setPlaygroundVariant] = useState<VariantKey>("rounded-neutral");
+  const [showIcons, setShowIcons] = useState(false);
 
   const playgroundCode = (() => {
     switch (playgroundVariant) {
@@ -411,10 +465,11 @@ export default function TabsPage() {
         <section id="playground">
           <ComponentPreview
             heading="Interactive playground"
-            description="Switch between the six Figma variants to compare the visual language side by side."
+            description="Switch between the six Figma variants and toggle icons on or off to compare the visual language side by side."
             code={playgroundCode}
           >
             <div className="flex w-full flex-col items-center gap-[24px]">
+              {/* Variant selector */}
               <div className="flex flex-wrap items-center justify-center gap-[8px]">
                 {VARIANTS.map((v) => (
                   <button
@@ -435,8 +490,33 @@ export default function TabsPage() {
                 ))}
               </div>
 
+              {/* Icon toggle */}
+              <div className="flex items-center gap-[8px]">
+                <span className="text-[13px] text-[var(--text-tertiary)]">Icons</span>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={showIcons}
+                  onClick={() => setShowIcons((v) => !v)}
+                  className={cn(
+                    "relative inline-flex h-[20px] w-[36px] shrink-0 cursor-pointer rounded-[999px] border-2 border-transparent transition-colors duration-200",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
+                    showIcons ? "bg-[var(--color-primary-600)]" : "bg-[var(--stroke-primary)]"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "pointer-events-none inline-block h-[16px] w-[16px] rounded-full bg-white shadow-sm transition-transform duration-200",
+                      showIcons ? "translate-x-[16px]" : "translate-x-0"
+                    )}
+                  />
+                </button>
+                <span className="text-[13px] text-[var(--text-tertiary)]">{showIcons ? "On" : "Off"}</span>
+              </div>
+
+              {/* Preview */}
               <div className="flex min-h-[96px] w-full items-center justify-center rounded-[12px] border border-dashed border-[var(--stroke-primary)] bg-[var(--surface-primary)] px-[24px] py-[24px]">
-                <VariantPreview variant={playgroundVariant} />
+                <VariantPreview variant={playgroundVariant} icon={showIcons} />
               </div>
 
               <p className="text-[12px] leading-[16px] text-[var(--text-tertiary)]">
@@ -453,7 +533,9 @@ export default function TabsPage() {
             description="Standalone pill tabs with a light brand border on each item. The active tab gets a neutral outline — no container tray."
             code={roundedNeutralCode}
           >
-            <RoundedPillDemo />
+            <WithAndWithoutIcon>
+              {(icon) => <RoundedPillDemo icon={icon} />}
+            </WithAndWithoutIcon>
           </ComponentPreview>
         </section>
 
@@ -464,7 +546,9 @@ export default function TabsPage() {
             description="Same pill shape, but the active tab is outlined and labelled in the brand colour. Use when you want stronger visual hierarchy."
             code={roundedBrandCode}
           >
-            <RoundedPillDemo brand />
+            <WithAndWithoutIcon>
+              {(icon) => <RoundedPillDemo brand icon={icon} />}
+            </WithAndWithoutIcon>
           </ComponentPreview>
         </section>
 
@@ -475,7 +559,9 @@ export default function TabsPage() {
             description="Best for primary page-level navigation. Tabs sit along a bottom border with an animated 2px brand underline anchoring the active view."
             code={lineCode}
           >
-            <LineTabsDemo />
+            <WithAndWithoutIcon>
+              {(icon) => <LineTabsDemo icon={icon} />}
+            </WithAndWithoutIcon>
           </ComponentPreview>
         </section>
 
@@ -486,7 +572,9 @@ export default function TabsPage() {
             description="Card-style tabs in a shadowed, bordered tray. The active trigger gets a full brand-coloured border — strong emphasis without a filled background."
             code={rectangleBrandCode}
           >
-            <RectBrandDemo />
+            <WithAndWithoutIcon>
+              {(icon) => <RectBrandDemo icon={icon} />}
+            </WithAndWithoutIcon>
           </ComponentPreview>
         </section>
 
@@ -497,7 +585,9 @@ export default function TabsPage() {
             description="Same card shape but the active trigger uses a neutral border — ideal when tabs sit next to strongly coloured content or in secondary panels."
             code={rectangleNeutralCode}
           >
-            <RectNeutralDemo />
+            <WithAndWithoutIcon>
+              {(icon) => <RectNeutralDemo icon={icon} />}
+            </WithAndWithoutIcon>
           </ComponentPreview>
         </section>
 
@@ -508,7 +598,9 @@ export default function TabsPage() {
             description="A grey tray where the active tab floats with a white background and a soft elevation shadow. Use for toolbars that float above a canvas or media surface."
             code={shadowCode}
           >
-            <WithShadowDemo />
+            <WithAndWithoutIcon>
+              {(icon) => <WithShadowDemo icon={icon} />}
+            </WithAndWithoutIcon>
           </ComponentPreview>
         </section>
 
@@ -524,6 +616,7 @@ export default function TabsPage() {
               "Keep labels short — 1–2 words is ideal, so every tab is visible without truncation",
               "Always show at least two tabs; otherwise use a heading",
               "Preserve tab state when users navigate away and return",
+              "Add icons to reinforce the meaning of labels, especially for navigation-heavy interfaces",
             ]}
             dontItems={[
               "Don't use tabs for sequential steps — use a stepper instead",
@@ -531,6 +624,7 @@ export default function TabsPage() {
               "Don't nest tabs within tabs",
               "Don't mix rectangle and rounded variants on the same surface",
               "Don't reorder tabs dynamically between sessions",
+              "Don't use icons alone without labels — always pair them for clarity",
             ]}
           />
         </section>
@@ -557,6 +651,10 @@ export default function TabsPage() {
               {
                 title: "Visible focus ring",
                 desc: "Every trigger exposes a 2px primary-500 focus ring with an offset so it stays readable over both light and dark backgrounds.",
+              },
+              {
+                title: "Icons and screen readers",
+                desc: "Tab icons are marked aria-hidden='true' so screen readers announce only the label text. Never rely on icons alone to convey tab identity.",
               },
               {
                 title: "Motion",
