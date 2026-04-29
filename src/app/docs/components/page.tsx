@@ -24,7 +24,7 @@ const components = [
   { name: "Text Area", href: "/docs/components/textarea", components: 1, variants: 3, image: "/Images/Thumbnails/base_components/Text Area.png" },
   { name: "Toast", href: "/docs/components/toast", components: 1, variants: 4, image: "/Images/Thumbnails/base_components/Toasters.png" },
   { name: "Toggles", href: "/docs/components/toggle", components: 1, variants: 2, image: "/Images/Thumbnails/base_components/Toggles.png" },
-  { name: "Tooltip", href: "/docs/components/tooltip", components: 1, variants: 4, image: "/Images/Thumbnails/base_components/Tags.png" },
+  { name: "Tooltip", href: "/docs/components/tooltip", components: 1, variants: 4, image: "/Images/Thumbnails/base_components/Tooltip.png" },
 ];
 
 function formatCount(components: number, variants: number) {
