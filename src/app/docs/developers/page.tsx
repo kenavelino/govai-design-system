@@ -23,21 +23,24 @@ const mcpJsonCode = `{
   }
 }`;
 
-const cursorRulesNote = `# Download Design.md from the repo, then save it as .cursorrules
-# in your project root. Cursor reads it automatically on every AI request.
+const cursorRulesCode = `# Download Design.md and save as .cursorrules in your project root.
+# Cursor reads it automatically on every AI request.
 
 curl -o .cursorrules \\
   https://raw.githubusercontent.com/kenavelino/govai-design-system/main/Design.md`;
 
-const windsurfNote = `# Same as Cursor — save as .windsurfrules instead.
+const windsurfCode = `# Same as Cursor — save as .windsurfrules instead.
 
 curl -o .windsurfrules \\
   https://raw.githubusercontent.com/kenavelino/govai-design-system/main/Design.md`;
 
-const bundleUrl = `# Full bundle URL — paste as first message in ChatGPT, v0, Bolt, Lovable, etc.
+const bundleCode = `# Open this URL, Select All, Copy, then paste as the first message
+# in your AI session (ChatGPT, v0, Bolt, Lovable, Google AI Studio).
 https://raw.githubusercontent.com/kenavelino/govai-design-system/main/govai-design-bundle.md`;
 
-const tokenExample = `/* Use CSS custom properties directly — never hardcode hex values */
+const bundleInstructCode = `Use the GovAI Design System above for all UI you generate.`;
+
+const tokenExample = `/* Always use CSS custom properties — never hardcode hex values */
 
 .my-card {
   background: var(--surface-default);
@@ -48,11 +51,11 @@ const tokenExample = `/* Use CSS custom properties directly — never hardcode h
 }
 
 /* Brand colour scale */
---color-primary-50   /* lightest tint */
+--color-primary-50      /* lightest tint */
 --color-primary-100
---color-primary-600  /* default interactive */
---color-primary-700  /* hover / active */
---color-primary-900  /* darkest */
+--color-primary-600     /* default interactive */
+--color-primary-700     /* hover / active */
+--color-primary-900     /* darkest */
 
 /* Semantic surface tokens */
 --surface-default        /* page background */
@@ -68,15 +71,11 @@ const tokenExample = `/* Use CSS custom properties directly — never hardcode h
 --stroke-primary    /* default border */
 --stroke-secondary  /* active / focused border */`;
 
-const copyComponentCode = `// 1. Browse the docs to find the component you need.
-//
-// 2. Open the Code tab in any ComponentPreview block
-//    to see the exact import path and usage.
-//
-// 3. The component source is at:
-//    src/components/ui/<name>.tsx
-//
-// Example — using Button:
+const componentImportCode = `// 1. Browse the docs to find the component you need.
+// 2. Open the Code tab in any ComponentPreview block to see the
+//    exact import path and usage.
+// 3. The component source lives at: src/components/ui/<name>.tsx
+
 import { Button } from "@/components/ui/button";
 
 <Button variant="primary" size="md">Save changes</Button>
@@ -84,20 +83,20 @@ import { Button } from "@/components/ui/button";
 <Button variant="destructive" size="sm">Delete</Button>
 <Button variant="ghost">Learn more</Button>`;
 
-const iconUsage = `// Icons are served from /public/icons/{weight}/{name}.svg
-// Use the <Icon> component — never raw <img> or <svg>.
+const iconCode = `// Icons use Phosphor Icons served from /public/icons/{weight}/{name}.svg
+// Always use the <Icon> component — never raw <img> or <svg>.
 import { Icon } from "@/components/ui/icon";
 
-<Icon name="gear"        className="h-[20px] w-[20px]" />
-<Icon name="users"       className="h-[20px] w-[20px]" weight="bold" />
-<Icon name="chart-bar"   className="h-[20px] w-[20px] text-[var(--color-primary-600)]" />`;
+<Icon name="gear"       className="h-[20px] w-[20px]" />
+<Icon name="users"      className="h-[20px] w-[20px]" weight="bold" />
+<Icon name="chart-bar"  className="h-[20px] w-[20px] text-[var(--color-primary-600)]" />`;
 
 export default function DevelopersPage() {
   return (
     <>
       <OnThisPage items={tocItems} />
 
-      <div className="space-y-[32px]">
+      <div className="space-y-[40px]">
         {/* Header */}
         <div>
           <h1 className="text-[24px] font-semibold leading-[32px] text-[var(--header-primary)]">
@@ -126,11 +125,11 @@ export default function DevelopersPage() {
               </thead>
               <tbody>
                 {[
-                  { tool: "Claude Code", method: "MCP server via .mcp.json (recommended)" },
-                  { tool: "Cursor", method: "Design.md → .cursorrules" },
-                  { tool: "Windsurf", method: "Design.md → .windsurfrules" },
+                  { tool: "Claude Code",                method: "MCP server via .mcp.json (recommended)" },
+                  { tool: "Cursor",                     method: "Design.md → .cursorrules" },
+                  { tool: "Windsurf",                   method: "Design.md → .windsurfrules" },
                   { tool: "ChatGPT / v0 / Bolt / Lovable", method: "Full bundle → paste as first message or system prompt" },
-                  { tool: "Google AI Studio", method: "Full bundle → System Instructions" },
+                  { tool: "Google AI Studio",           method: "Full bundle → System Instructions" },
                 ].map((row, i, arr) => (
                   <tr key={row.tool} className={i < arr.length - 1 ? "border-b border-[var(--stroke-primary)]" : ""}>
                     <td className="px-[16px] py-[12px] font-medium text-[var(--header-primary)]">{row.tool}</td>
@@ -151,30 +150,28 @@ export default function DevelopersPage() {
             This is the recommended integration. The MCP server connects Claude directly to the live design system — no copy-pasting, and it auto-updates every time the design system changes.
           </p>
 
-          <div className="mt-5 flex flex-col gap-[16px]">
-            <div className="rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
+          <div className="mt-5 flex flex-col gap-[20px]">
+            <div>
               <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">
-                Step 1 — Create <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px]">.mcp.json</code> in your project root
+                Step 1 — Create <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px] font-normal">.mcp.json</code> in your project root
               </p>
-              <p className="mt-2 text-[14px] leading-[20px] text-[var(--text-tertiary)]">
+              <p className="mt-1 text-[14px] leading-[20px] text-[var(--text-tertiary)]">
                 If your project already has a <code className="text-[13px]">.mcp.json</code>, add the <code className="text-[13px]">"govai-design-system"</code> block inside the existing <code className="text-[13px]">"mcpServers"</code> section.
               </p>
               <CodeBlock code={mcpJsonCode} language="json" className="mt-3" />
             </div>
 
-            <div className="rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
+            <div>
               <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">
                 Step 2 — Restart Claude Code in your project
               </p>
-              <p className="mt-2 text-[14px] leading-[20px] text-[var(--text-tertiary)]">
+              <p className="mt-1 text-[14px] leading-[20px] text-[var(--text-tertiary)]">
                 That&apos;s it. Claude will automatically load the design principles, use the correct tokens, apply the right components, and follow light/dark mode rules for every UI it generates in that project.
               </p>
             </div>
 
             <div className="rounded-[12px] border border-[var(--stroke-primary)] bg-[var(--surface-alt-tertiary)] p-[20px]">
-              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">
-                Why MCP?
-              </p>
+              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Why MCP?</p>
               <ul className="mt-2 flex flex-col gap-[6px] text-[14px] leading-[20px] text-[var(--text-tertiary)]">
                 <li>• Always reads live source — tokens, components, and rules stay current automatically</li>
                 <li>• No bundle to paste or rules file to maintain</li>
@@ -193,15 +190,22 @@ export default function DevelopersPage() {
           <p className="mt-3 text-[16px] leading-[24px] text-[var(--text-secondary)]">
             Download <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px]">Design.md</code> from the repo and save it as the rules file for your editor. The AI reads it automatically on every generation.
           </p>
-          <div className="mt-5 flex flex-col gap-[16px]">
-            <div className="rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
-              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Cursor — save as <code className="text-[13px]">.cursorrules</code></p>
-              <CodeBlock code={cursorRulesNote} language="bash" className="mt-3" />
+
+          <div className="mt-5 flex flex-col gap-[20px]">
+            <div>
+              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">
+                Cursor — save as <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px] font-normal">.cursorrules</code>
+              </p>
+              <CodeBlock code={cursorRulesCode} language="bash" className="mt-3" />
             </div>
-            <div className="rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
-              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Windsurf — save as <code className="text-[13px]">.windsurfrules</code></p>
-              <CodeBlock code={windsurfNote} language="bash" className="mt-3" />
+
+            <div>
+              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">
+                Windsurf — save as <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px] font-normal">.windsurfrules</code>
+              </p>
+              <CodeBlock code={windsurfCode} language="bash" className="mt-3" />
             </div>
+
             <p className="text-[14px] leading-[20px] text-[var(--text-tertiary)]">
               When the design system updates, re-run the curl command to fetch the latest <code className="text-[13px]">Design.md</code> and replace your rules file.
             </p>
@@ -216,21 +220,16 @@ export default function DevelopersPage() {
           <p className="mt-3 text-[16px] leading-[24px] text-[var(--text-secondary)]">
             For tools that don&apos;t support rules files, paste the full design bundle as the first message in your conversation, or into the system prompt / instructions field.
           </p>
-          <div className="mt-5 flex flex-col gap-[16px]">
-            <div className="rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
-              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Step 1 — Open the bundle URL</p>
-              <CodeBlock code={bundleUrl} language="bash" className="mt-3" />
+
+          <div className="mt-5 flex flex-col gap-[20px]">
+            <div>
+              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Step 1 — Open the bundle URL in your browser</p>
+              <CodeBlock code={bundleCode} language="bash" className="mt-3" />
             </div>
-            <div className="rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
-              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Step 2 — Paste and instruct</p>
-              <p className="mt-2 text-[14px] leading-[20px] text-[var(--text-tertiary)]">
-                Select All → Copy the entire page, then paste it as the first message in your AI session and add:
-              </p>
-              <CodeBlock
-                code={`Use the GovAI Design System above for all UI you generate.`}
-                language="bash"
-                className="mt-3"
-              />
+
+            <div>
+              <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Step 2 — Select All → Copy → Paste as first message, then add:</p>
+              <CodeBlock code={bundleInstructCode} language="bash" className="mt-3" />
             </div>
           </div>
         </section>
@@ -254,11 +253,11 @@ export default function DevelopersPage() {
               <tbody>
                 {[
                   { tool: "get_design_principles", desc: "Design.md — philosophy, foundations, component conventions, accessibility rules, and anti-patterns. Claude calls this at the start of any UI task." },
-                  { tool: "get_design_tokens", desc: "tokens.ts — TypeScript exports for colors, typography, spacing, radius, elevation, z-index, motion, breakpoints, and grid." },
-                  { tool: "get_global_styles", desc: "globals.css — all CSS custom properties: palette tokens (--color-*), semantic tokens (--surface-*, --text-*, --stroke-*), light + dark mode." },
-                  { tool: "list_components", desc: "Names of all UI primitives in src/components/ui/. Claude calls this before composing UI to see what's already built." },
-                  { tool: "get_component", desc: "Full source code of a specific component (e.g. 'button', 'badge'). Claude reads the API, variants, and styling before using it." },
-                  { tool: "get_design_bundle", desc: "The entire system as one bundle: Design.md + tokens.ts + globals.css + every component. Used for fresh sessions in other tools." },
+                  { tool: "get_design_tokens",     desc: "tokens.ts — TypeScript exports for colors, typography, spacing, radius, elevation, z-index, motion, breakpoints, and grid." },
+                  { tool: "get_global_styles",     desc: "globals.css — all CSS custom properties: palette tokens (--color-*), semantic tokens (--surface-*, --text-*, --stroke-*), light + dark mode." },
+                  { tool: "list_components",       desc: "Names of all UI primitives in src/components/ui/. Claude calls this before composing UI to see what's already built." },
+                  { tool: "get_component",         desc: "Full source code of a specific component (e.g. 'button', 'badge'). Claude reads the API, variants, and styling before using it." },
+                  { tool: "get_design_bundle",     desc: "The entire system as one bundle: Design.md + tokens.ts + globals.css + every component. Used for fresh sessions in other tools." },
                 ].map((row, i, arr) => (
                   <tr key={row.tool} className={i < arr.length - 1 ? "border-b border-[var(--stroke-primary)]" : ""}>
                     <td className="px-[16px] py-[12px] align-top">
@@ -291,17 +290,19 @@ export default function DevelopersPage() {
           <p className="mt-3 text-[16px] leading-[24px] text-[var(--text-secondary)]">
             Every component is documented on this site with a live preview and a Code tab showing the exact import path and usage. Component source lives in <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px]">src/components/ui/</code>.
           </p>
-          <div className="mt-5 flex flex-col gap-[16px]">
-            <div className="rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
+
+          <div className="mt-5 flex flex-col gap-[20px]">
+            <div>
               <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Component imports</p>
-              <CodeBlock code={copyComponentCode} language="tsx" className="mt-3" />
+              <CodeBlock code={componentImportCode} language="tsx" className="mt-3" />
             </div>
-            <div className="rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
+
+            <div>
               <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Icon usage</p>
-              <p className="mt-2 text-[14px] leading-[20px] text-[var(--text-tertiary)]">
+              <p className="mt-1 text-[14px] leading-[20px] text-[var(--text-tertiary)]">
                 Icons use Phosphor Icons served from <code className="text-[13px]">/public/icons/</code>. Always use the <code className="text-[13px]">&lt;Icon&gt;</code> component — never raw SVG or img tags.
               </p>
-              <CodeBlock code={iconUsage} language="tsx" className="mt-3" />
+              <CodeBlock code={iconCode} language="tsx" className="mt-3" />
             </div>
           </div>
         </section>
@@ -313,12 +314,12 @@ export default function DevelopersPage() {
           </h2>
           <div className="mt-4 grid gap-[12px] sm:grid-cols-2">
             {[
-              { label: "GitHub Repository",   href: "https://github.com/kenavelino/govai-design-system",                                                                     desc: "Source code, issues, and pull requests" },
-              { label: "Live Docs",           href: "https://govai-design-system.kennediavelinowork.workers.dev",                                                            desc: "This documentation site, deployed on Cloudflare Workers" },
-              { label: "npm — govai-mcp",     href: "https://www.npmjs.com/package/govai-mcp",                                                                               desc: "The MCP server package used with Claude Code" },
-              { label: "Design Bundle",       href: "https://raw.githubusercontent.com/kenavelino/govai-design-system/main/govai-design-bundle.md",                          desc: "Full system bundle — tokens, styles, and all components" },
-              { label: "Design Rules",        href: "https://raw.githubusercontent.com/kenavelino/govai-design-system/main/Design.md",                                       desc: "Design.md — principles and conventions for Cursor/Windsurf" },
-              { label: "Global Styles",       href: "https://raw.githubusercontent.com/kenavelino/govai-design-system/main/src/app/globals.css",                            desc: "CSS custom properties — full token definitions" },
+              { label: "GitHub Repository", href: "https://github.com/kenavelino/govai-design-system",                                                              desc: "Source code, issues, and pull requests" },
+              { label: "Live Docs",         href: "https://govai-design-system.kennediavelinowork.workers.dev",                                                     desc: "This documentation site, deployed on Cloudflare Workers" },
+              { label: "npm — govai-mcp",   href: "https://www.npmjs.com/package/govai-mcp",                                                                        desc: "The MCP server package used with Claude Code" },
+              { label: "Design Bundle",     href: "https://raw.githubusercontent.com/kenavelino/govai-design-system/main/govai-design-bundle.md",                   desc: "Full system bundle — tokens, styles, and all components" },
+              { label: "Design Rules",      href: "https://raw.githubusercontent.com/kenavelino/govai-design-system/main/Design.md",                                desc: "Design.md — principles and conventions for Cursor/Windsurf" },
+              { label: "Global Styles",     href: "https://raw.githubusercontent.com/kenavelino/govai-design-system/main/src/app/globals.css",                      desc: "CSS custom properties — full token definitions" },
             ].map((link) => (
               <a
                 key={link.label}
