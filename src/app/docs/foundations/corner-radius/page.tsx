@@ -124,7 +124,7 @@ export default function CornerRadiusPage() {
                 {usageMap.map((row) => (
                   <tr
                     key={row.token}
-                    className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]"
+                    className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]"
                   >
                     <td className="px-[16px] py-[16px] leading-[20px]">
                       <code className="text-[12px]">{row.token}</code>

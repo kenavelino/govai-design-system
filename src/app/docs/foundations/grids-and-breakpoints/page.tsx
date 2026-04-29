@@ -143,7 +143,7 @@ export default function GridsAndBreakpointsPage() {
                 {breakpointData.map((bp) => (
                   <tr
                     key={bp.name}
-                    className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]"
+                    className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]"
                   >
                     <td className="px-[16px] py-[16px] leading-[20px] font-medium text-[var(--text-primary)]">
                       {bp.name}

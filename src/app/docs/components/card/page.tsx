@@ -96,7 +96,7 @@ export default function CardPage() {
                   ["Standard", "stroke/primary", "None", "Static content display — dashboards, summaries, detail panels."],
                   ["Interactive", "stroke/primary (hover: primary/300)", "Hover shadow, cursor pointer", "Clickable cards that navigate to a detail view or trigger an action."],
                 ].map(([variant, border, interaction, use]) => (
-                  <tr key={variant} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]">
+                  <tr key={variant} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]">
                     <td className="px-[16px] py-[16px] leading-[20px] font-medium">{variant}</td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{border}</td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{interaction}</td>

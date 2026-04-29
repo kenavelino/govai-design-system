@@ -68,7 +68,7 @@ export default function ElevationPage() {
                   ["5", "Toast notifications, floating action buttons"],
                   ["6", "Special emphasis, feature highlights"],
                 ].map(([level, use]) => (
-                  <tr key={level} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]">
+                  <tr key={level} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]">
                     <td className="px-[16px] py-[16px] leading-[20px] font-medium">Elevation {level}</td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{use}</td>
                   </tr>
@@ -102,7 +102,7 @@ export default function ElevationPage() {
                   ["z-tooltip", "1500", "Tooltips"],
                   ["z-toast", "1600", "Toast notifications"],
                 ].map(([token, value, use]) => (
-                  <tr key={token} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]">
+                  <tr key={token} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]">
                     <td className="px-[16px] py-[16px] leading-[20px]"><code>{token}</code></td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{value}</td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{use}</td>

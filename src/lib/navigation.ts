@@ -30,8 +30,7 @@ export const navigation: NavGroup[] = [
   {
     label: "Resources",
     items: [
-      { title: "Figma files", href: "/docs/resources/figma-files" },
-      { title: "Icons", href: "/docs/resources/icons" },
+{ title: "Icons", href: "/docs/resources/icons" },
       { title: "Country Flags", href: "/docs/resources/flags" },
       { title: "Logos", href: "/docs/resources/logos" },
     ],
@@ -57,6 +56,7 @@ export const navigation: NavGroup[] = [
       { title: "Steppers", href: "/docs/components/stepper" },
       { title: "Table", href: "/docs/components/table" },
       { title: "Tabs", href: "/docs/components/tabs" },
+      { title: "Tags", href: "/docs/components/tags" },
       { title: "Text Area", href: "/docs/components/textarea" },
       { title: "Toast", href: "/docs/components/toast" },
       { title: "Toggles", href: "/docs/components/toggle" },

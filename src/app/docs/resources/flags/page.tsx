@@ -26,7 +26,7 @@ const REGIONS: { key: Region; label: string; filter: string }[] = [
 type Country = { name: string; code: string; region: string };
 
 async function downloadFlag(country: Country) {
-  const url = `https://flagcdn.com/${country.code}.svg`;
+  const url = `https://hatscripts.github.io/circle-flags/flags/${country.code}.svg`;
   try {
     const res = await fetch(url);
     const blob = await res.blob();
@@ -67,18 +67,15 @@ function FlagTile({
       aria-label={`Copy ${country.name} ISO code`}
       title={country.name}
     >
-      <div className="flex h-[30px] w-[44px] items-center justify-center overflow-hidden rounded-[2px] shadow-[0_1px_3px_rgba(0,0,0,0.12)]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={`https://flagcdn.com/w40/${country.code}.png`}
-          srcSet={`https://flagcdn.com/w80/${country.code}.png 2x`}
-          alt={country.name}
-          width={44}
-          height={30}
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={`https://hatscripts.github.io/circle-flags/flags/${country.code}.svg`}
+        alt={country.name}
+        width={40}
+        height={40}
+        className="h-[40px] w-[40px]"
+        loading="lazy"
+      />
       <span className="max-w-full truncate text-[12px] leading-[16px] text-[var(--text-secondary)]">
         {isCopied ? "Copied!" : country.name}
       </span>
@@ -166,7 +163,7 @@ export default function FlagsPage() {
           </p>
           <div className="mt-5 rounded-[12px] border border-[var(--stroke-primary)] bg-[var(--surface-tertiary)] p-[24px]">
             <code className="text-[13px] leading-[20px] text-[var(--text-primary)]">
-              {`<img src="https://flagcdn.com/${firstCountry?.code ?? "ae"}.svg" alt="${firstCountry?.name ?? "United Arab Emirates"}" width="40" />`}
+              {`<img src="https://hatscripts.github.io/circle-flags/flags/${firstCountry?.code ?? "ae"}.svg" alt="${firstCountry?.name ?? "United Arab Emirates"}" width="40" height="40" />`}
             </code>
           </div>
         </section>

@@ -231,7 +231,7 @@ ai-fac-button.bg.primary-default
               </thead>
               <tbody>
                 {productPrefixes.map((row) => (
-                  <tr key={row.prefix} className="border-b border-[var(--stroke-primary)] transition-colors last:border-0 hover:bg-[var(--surface-primary)]">
+                  <tr key={row.prefix} className="border-b border-[var(--stroke-primary)] transition-colors last:border-0 hover:bg-[var(--color-neutral-100)]">
                     <td className="px-[16px] py-[16px] font-medium leading-[20px] text-[var(--text-primary)]">{row.product}</td>
                     <td className="px-[16px] py-[16px]">
                       <TokenChip tone="primary">{row.prefix}</TokenChip>

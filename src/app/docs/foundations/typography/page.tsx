@@ -51,7 +51,7 @@ function TypeScaleTable({ samples }: { samples: TypeSample[] }) {
           {samples.map((s, idx) => (
             <tr
               key={`${s.category}-${s.weight}-${idx}`}
-              className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]"
+              className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]"
             >
               <td className="px-[16px] py-[16px] align-middle">
                 <span
@@ -452,7 +452,7 @@ export default function TypographyPage() {
                   { weight: "Medium", value: 500, usage: "Headings, labels, buttons, navigation" },
                   { weight: "SemiBold", value: 600, usage: "Emphasis, key metrics, important labels" },
                 ].map(w => (
-                  <tr key={w.weight} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]">
+                  <tr key={w.weight} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]">
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--text-primary)]" style={{ fontWeight: w.value }}>{w.weight}</td>
                     <td className="px-[16px] py-[16px] leading-[20px]"><code>{w.value}</code></td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{w.usage}</td>

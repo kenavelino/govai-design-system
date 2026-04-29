@@ -261,8 +261,8 @@ export function DataTable<T extends Record<string, unknown>>({
                         : isSelected
                         ? "bg-[var(--color-primary-50)]"
                         : isStriped
-                        ? "bg-[var(--surface-tertiary)] hover:bg-[var(--surface-primary)]"
-                        : "hover:bg-[var(--surface-primary)]",
+                        ? "bg-[var(--surface-tertiary)] hover:bg-[var(--color-neutral-100)]"
+                        : "hover:bg-[var(--color-neutral-100)]",
                     )}
                     aria-selected={selectable ? isSelected : undefined}
                   >

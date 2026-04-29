@@ -63,7 +63,7 @@ export default function BadgePage() {
                   { variant: "warning" as const, label: "Warning", bg: "warning/100", use: "Cautionary states — pending, expiring, deprecated." },
                   { variant: "info" as const, label: "Info", bg: "info/100", use: "Informational states — new, beta, in review, updated." },
                 ].map(v => (
-                  <tr key={v.label} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]">
+                  <tr key={v.label} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]">
                     <td className="px-[16px] py-[16px] leading-[20px] font-medium">{v.label}</td>
                     <td className="px-[16px] py-[16px] leading-[20px]"><Badge variant={v.variant}>{v.label}</Badge></td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{v.bg}</td>

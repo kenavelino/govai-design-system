@@ -75,7 +75,7 @@ export default function ToastPage() {
                   ["Warning", "warning/50", "warning/300", "Cautionary notices — approaching limits, deprecated features."],
                   ["Info", "info/50", "info/300", "Informational updates — new features, version updates."],
                 ].map(([variant, bg, border, use]) => (
-                  <tr key={variant} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]">
+                  <tr key={variant} className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]">
                     <td className="px-[16px] py-[16px] leading-[20px] font-medium">{variant}</td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{bg}</td>
                     <td className="px-[16px] py-[16px] leading-[20px] text-[var(--header-secondary)]">{border}</td>

@@ -8,6 +8,7 @@ import { navigation } from "@/lib/navigation";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/docs/logo";
+import { SearchDialog } from "@/components/docs/search-dialog";
 
 type Crumb = { title: string; href: string; current?: boolean };
 
@@ -28,11 +29,25 @@ export function Header() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const pathname = usePathname();
   const crumbs = getBreadcrumbs(pathname);
 
   useEffect(() => setMounted(true), []);
   useEffect(() => setMobileOpen(false), [pathname]);
+  useEffect(() => setSearchOpen(false), [pathname]);
+
+  // Cmd+K / Ctrl+K global shortcut
+  useEffect(() => {
+    function handler(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((o) => !o);
+      }
+    }
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const themeGroupRef = useRef<HTMLDivElement>(null);
   const [themePill, setThemePill] = useState<{ x: number; w: number; h: number; visible: boolean }>({
@@ -130,6 +145,7 @@ export function Header() {
           <button
             type="button"
             aria-label="Search"
+            onClick={() => setSearchOpen(true)}
             className="flex h-[32px] w-[200px] items-center justify-between gap-[8px] rounded-[6px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] px-[12px] text-[14px] leading-[20px] text-[var(--text-tertiary)] transition-colors hover:bg-[var(--surface-alt-tertiary)]"
           >
             <span className="flex items-center gap-[8px]">
@@ -194,6 +210,8 @@ export function Header() {
           )}
         </div>
       </header>
+
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
 
       {/* Mobile nav overlay */}
       {mobileOpen && (

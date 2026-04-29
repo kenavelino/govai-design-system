@@ -110,9 +110,9 @@ function FieldDemo({
         <div className={`flex items-stretch rounded-[8px] border ${stateClasses(state)} overflow-hidden ${shadow}`}>
           <div className={`flex items-center gap-[4px] pl-[14px] pr-[12px] ${inputPadY} border-r border-[var(--stroke-primary)]`}>
             <img
-              src="https://flagcdn.com/ae.svg"
+              src="https://hatscripts.github.io/circle-flags/flags/ae.svg"
               alt="UAE"
-              className="h-[20px] w-[20px] overflow-hidden rounded-full object-cover"
+              className="h-[20px] w-[20px] shrink-0"
             />
             <span className={`${textSize} ${textClasses(state)}`}>+971</span>
             <Icon name="caret-down" className="h-[16px] w-[16px] text-[var(--text-tertiary)]" />

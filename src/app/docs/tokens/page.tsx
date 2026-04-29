@@ -19,7 +19,7 @@ const tocItems = [
 function TokenRow({ token, value, desc }: { token: string; value: string; desc?: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <tr className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)] group">
+    <tr className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)] group">
       <td className="px-[16px] py-[16px] leading-[20px]">
         <div className="flex items-center gap-2">
           <code className="!text-[12px]">{token}</code>

@@ -162,7 +162,7 @@ export default function SpacingPage() {
                   return (
                     <tr
                       key={key}
-                      className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--surface-primary)]"
+                      className="border-b border-[var(--stroke-primary)] last:border-0 transition-colors hover:bg-[var(--color-neutral-100)]"
                     >
                       <td className="px-[16px] py-[16px] font-medium leading-[20px] text-[var(--text-primary)]">
                         size-{key}
