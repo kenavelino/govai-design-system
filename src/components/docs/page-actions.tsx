@@ -15,7 +15,8 @@ function flatten(): FlatItem[] {
 }
 
 export function PageActions() {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+  const pathname = rawPathname.replace(/\/$/, "") || "/";
   const flat = flatten();
   const index = flat.findIndex((i) => i.href === pathname);
   const prev = index > 0 ? flat[index - 1] : null;
