@@ -11,14 +11,9 @@ import { cn } from "@/lib/utils";
 
 const DEMO_TABS = ["Overview", "Analytics", "Settings", "Team"];
 
-type LineTabsProps = {
-  tabs?: string[];
-  defaultValue?: string;
-  dense?: boolean;
-};
-
-function LineTabsDemo({ tabs = DEMO_TABS, defaultValue, dense = false }: LineTabsProps) {
-  const [value, setValue] = useState(defaultValue ?? tabs[0]);
+// ─── Line variant ────────────────────────────────────────────────────────────
+function LineTabsDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
+  const [value, setValue] = useState(tabs[0]);
   const listRef = useRef<HTMLDivElement>(null);
   const [ind, setInd] = useState({ left: 0, width: 0, visible: false });
 
@@ -26,32 +21,18 @@ function LineTabsDemo({ tabs = DEMO_TABS, defaultValue, dense = false }: LineTab
     const list = listRef.current;
     if (!list) return;
     const measure = () => {
-      const active = list.querySelector<HTMLElement>(
-        '[role="tab"][data-state="active"]'
-      );
-      if (!active) {
-        setInd((p) => ({ ...p, visible: false }));
-        return;
-      }
+      const active = list.querySelector<HTMLElement>('[role="tab"][data-state="active"]');
+      if (!active) { setInd((p) => ({ ...p, visible: false })); return; }
       const listRect = list.getBoundingClientRect();
       const rect = active.getBoundingClientRect();
-      setInd({
-        left: rect.left - listRect.left,
-        width: rect.width,
-        visible: true,
-      });
+      setInd({ left: rect.left - listRect.left, width: rect.width, visible: true });
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(list);
-    list
-      .querySelectorAll<HTMLElement>('[role="tab"]')
-      .forEach((el) => ro.observe(el));
+    list.querySelectorAll<HTMLElement>('[role="tab"]').forEach((el) => ro.observe(el));
     window.addEventListener("resize", measure);
-    return () => {
-      ro.disconnect();
-      window.removeEventListener("resize", measure);
-    };
+    return () => { ro.disconnect(); window.removeEventListener("resize", measure); };
   }, [value, tabs]);
 
   return (
@@ -65,8 +46,7 @@ function LineTabsDemo({ tabs = DEMO_TABS, defaultValue, dense = false }: LineTab
             key={tab}
             value={tab}
             className={cn(
-              "relative inline-flex items-center justify-center text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200 ease-[var(--ease-out)]",
-              dense ? "px-[4px] pb-[8px] pt-[6px]" : "px-[4px] pb-[12px] pt-[8px]",
+              "relative inline-flex items-center justify-center pb-[12px] pt-[8px] px-[4px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
               "hover:text-[var(--header-primary)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
               "data-[state=active]:text-[var(--color-primary-700)] dark:data-[state=active]:text-[var(--color-primary-400)]"
@@ -78,7 +58,7 @@ function LineTabsDemo({ tabs = DEMO_TABS, defaultValue, dense = false }: LineTab
         <span
           aria-hidden
           className={cn(
-            "pointer-events-none absolute bottom-[-1px] h-[2px] rounded-full bg-[var(--color-primary-600)] transition-[transform,width,opacity] duration-[250ms] ease-[var(--ease-out)]",
+            "pointer-events-none absolute bottom-[-1px] h-[2px] rounded-tl-[2px] rounded-tr-[2px] bg-[var(--color-primary-600)] transition-[transform,width,opacity] duration-[250ms] ease-[var(--ease-out)]",
             ind.visible ? "opacity-100" : "opacity-0"
           )}
           style={{ width: ind.width, transform: `translateX(${ind.left}px)` }}
@@ -88,36 +68,20 @@ function LineTabsDemo({ tabs = DEMO_TABS, defaultValue, dense = false }: LineTab
   );
 }
 
-type RectTone = "brand" | "neutral";
-
-function RectangleTabsDemo({
-  tone,
-  elevated = false,
-  tabs = DEMO_TABS,
-}: {
-  tone: RectTone;
-  elevated?: boolean;
-  tabs?: string[];
-}) {
+// ─── Rectangle · Brand variant ───────────────────────────────────────────────
+function RectBrandDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
   return (
     <TabsPrimitive.Root defaultValue={tabs[0]}>
-      <TabsPrimitive.List
-        className={cn(
-          "inline-flex items-center gap-[8px] rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] p-[8px]",
-          elevated && "shadow-[0_1px_3px_0_rgba(16,24,40,0.15)]"
-        )}
-      >
+      <TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
         {tabs.map((tab) => (
           <TabsPrimitive.Trigger
             key={tab}
             value={tab}
             className={cn(
-              "inline-flex h-[36px] items-center justify-center rounded-[6px] border border-transparent px-[12px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200 ease-[var(--ease-out)]",
+              "inline-flex items-center justify-center rounded-[8px] border border-transparent px-[16px] py-[10px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
               "hover:text-[var(--header-primary)]",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
-              tone === "brand"
-                ? "data-[state=active]:border-[var(--color-primary-600)] data-[state=active]:text-[var(--color-primary-700)] dark:data-[state=active]:text-[var(--color-primary-400)]"
-                : "data-[state=active]:border-[var(--stroke-secondary)] data-[state=active]:bg-[var(--surface-tertiary)] data-[state=active]:text-[var(--header-primary)]"
+              "data-[state=active]:border-[var(--color-primary-600)] data-[state=active]:bg-[var(--surface-default)] data-[state=active]:text-[var(--color-primary-700)] dark:data-[state=active]:text-[var(--color-primary-400)]"
             )}
           >
             {tab}
@@ -128,33 +92,88 @@ function RectangleTabsDemo({
   );
 }
 
-function ChipTabsDemo({
-  tabs = DEMO_TABS,
-  activeBrand = false,
-}: {
-  tabs?: string[];
-  activeBrand?: boolean;
-}) {
+// ─── Rectangle · Neutral variant ─────────────────────────────────────────────
+function RectNeutralDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
   return (
-    <Tabs defaultValue={tabs[0]}>
-      <TabsList>
+    <TabsPrimitive.Root defaultValue={tabs[0]}>
+      <TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)]">
         {tabs.map((tab) => (
-          <TabsTrigger
+          <TabsPrimitive.Trigger
             key={tab}
             value={tab}
             className={cn(
-              activeBrand &&
-                "data-[state=active]:text-[var(--color-primary-700)] dark:data-[state=active]:text-[var(--color-primary-400)]"
+              "inline-flex items-center justify-center rounded-[8px] border border-transparent px-[10px] py-[8px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-colors duration-200",
+              "hover:text-[var(--header-primary)]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
+              "data-[state=active]:border-[var(--stroke-secondary)] data-[state=active]:text-[var(--header-primary)]"
             )}
           >
             {tab}
-          </TabsTrigger>
+          </TabsPrimitive.Trigger>
         ))}
-      </TabsList>
-    </Tabs>
+      </TabsPrimitive.List>
+    </TabsPrimitive.Root>
   );
 }
 
+// ─── Rounded · Neutral / Brand variants ──────────────────────────────────────
+function RoundedPillDemo({
+  tabs = DEMO_TABS,
+  brand = false,
+}: {
+  tabs?: string[];
+  brand?: boolean;
+}) {
+  return (
+    <TabsPrimitive.Root defaultValue={tabs[0]}>
+      <TabsPrimitive.List className="inline-flex items-center gap-[12px]">
+        {tabs.map((tab) => (
+          <TabsPrimitive.Trigger
+            key={tab}
+            value={tab}
+            className={cn(
+              "inline-flex items-center justify-center rounded-[999px] border px-[16px] py-[8px] text-[14px] font-medium leading-[20px] transition-colors duration-200",
+              "border-[var(--color-primary-100)] text-[var(--text-tertiary)]",
+              "hover:text-[var(--header-primary)]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
+              brand
+                ? "data-[state=active]:border-[var(--color-primary-600)] data-[state=active]:text-[var(--color-primary-700)] dark:data-[state=active]:text-[var(--color-primary-400)]"
+                : "data-[state=active]:border-[var(--stroke-secondary)] data-[state=active]:text-[var(--header-primary)]"
+            )}
+          >
+            {tab}
+          </TabsPrimitive.Trigger>
+        ))}
+      </TabsPrimitive.List>
+    </TabsPrimitive.Root>
+  );
+}
+
+// ─── With Shadow variant ──────────────────────────────────────────────────────
+function WithShadowDemo({ tabs = DEMO_TABS }: { tabs?: string[] }) {
+  return (
+    <TabsPrimitive.Root defaultValue={tabs[0]}>
+      <TabsPrimitive.List className="inline-flex items-center rounded-[8px] bg-[var(--surface-alt-tertiary)] p-[4px] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
+        {tabs.map((tab) => (
+          <TabsPrimitive.Trigger
+            key={tab}
+            value={tab}
+            className={cn(
+              "inline-flex items-center justify-center rounded-[8px] px-[16px] py-[8px] text-[14px] font-medium leading-[20px] text-[var(--text-tertiary)] transition-all duration-200",
+              "hover:text-[var(--header-primary)]",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary-500)] focus-visible:ring-offset-2",
+              "data-[state=active]:bg-[var(--surface-default)] data-[state=active]:text-[var(--header-primary)] data-[state=active]:shadow-[0px_0px_24px_0px_rgba(28,27,27,0.08)]"
+            )}
+          >
+            {tab}
+          </TabsPrimitive.Trigger>
+        ))}
+      </TabsPrimitive.List>
+    </TabsPrimitive.Root>
+  );
+}
+
+// ─── Playground ──────────────────────────────────────────────────────────────
 type VariantKey =
   | "rounded-neutral"
   | "rounded-brand"
@@ -167,152 +186,63 @@ const VARIANTS: { key: VariantKey; label: string; description: string }[] = [
   {
     key: "rounded-neutral",
     label: "Rounded · Neutral",
-    description: "Pill tabs on a subtle surface. Neutral active state.",
+    description: "Standalone pill tabs with a neutral border on the active item. No container tray.",
   },
   {
     key: "rounded-brand",
     label: "Rounded · Brand",
-    description: "Pill tabs with a brand-colored active label.",
+    description: "Pill tabs with a brand-coloured border and text on the active item.",
   },
   {
     key: "line",
     label: "Line",
-    description: "Underline indicator anchored to a bottom border.",
+    description: "Minimal underline indicator anchored to a bottom border — best for primary navigation.",
   },
   {
     key: "rectangle-brand",
     label: "Rectangle · Brand",
-    description: "Card-style tabs; active tab gets a brand border.",
+    description: "Card-style tabs in a bordered tray. Active tab is outlined in the brand colour.",
   },
   {
     key: "rectangle-neutral",
     label: "Rectangle · Neutral",
-    description: "Card-style tabs; active tab is filled with a neutral tone.",
+    description: "Card-style tabs in a simple border tray. Active tab gets a neutral outline.",
   },
   {
     key: "shadow",
     label: "With Shadow",
-    description: "Elevated rectangle tabs for floating toolbars.",
+    description: "Grey-tray tabs where the active tab floats with a white background and subtle elevation.",
   },
 ];
 
 function VariantPreview({ variant }: { variant: VariantKey }) {
   switch (variant) {
-    case "line":
-      return <LineTabsDemo />;
-    case "rectangle-brand":
-      return <RectangleTabsDemo tone="brand" />;
-    case "rectangle-neutral":
-      return <RectangleTabsDemo tone="neutral" />;
-    case "shadow":
-      return <RectangleTabsDemo tone="brand" elevated />;
-    case "rounded-brand":
-      return <ChipTabsDemo activeBrand />;
+    case "line":             return <LineTabsDemo />;
+    case "rectangle-brand":  return <RectBrandDemo />;
+    case "rectangle-neutral":return <RectNeutralDemo />;
+    case "shadow":           return <WithShadowDemo />;
+    case "rounded-brand":    return <RoundedPillDemo brand />;
     case "rounded-neutral":
-    default:
-      return <ChipTabsDemo />;
+    default:                 return <RoundedPillDemo />;
   }
 }
 
+// ─── TOC ─────────────────────────────────────────────────────────────────────
 const tocItems = [
-  { id: "overview", title: "Overview", level: 2 },
-  { id: "playground", title: "Interactive playground", level: 2 },
-  { id: "rounded", title: "Rounded (chip) tabs", level: 2 },
-  { id: "line", title: "Line (underline)", level: 2 },
-  { id: "rectangle-brand", title: "Rectangle · Brand", level: 2 },
-  { id: "rectangle-neutral", title: "Rectangle · Neutral", level: 2 },
-  { id: "shadow", title: "With shadow", level: 2 },
-  { id: "usage", title: "Usage Guidelines", level: 2 },
-  { id: "accessibility", title: "Accessibility", level: 2 },
-  { id: "api", title: "API Reference", level: 2 },
+  { id: "overview",           title: "Overview",              level: 2 },
+  { id: "playground",         title: "Interactive playground", level: 2 },
+  { id: "rounded-neutral",    title: "Rounded · Neutral",     level: 2 },
+  { id: "rounded-brand",      title: "Rounded · Brand",       level: 2 },
+  { id: "line",               title: "Line (underline)",       level: 2 },
+  { id: "rectangle-brand",    title: "Rectangle · Brand",     level: 2 },
+  { id: "rectangle-neutral",  title: "Rectangle · Neutral",   level: 2 },
+  { id: "shadow",             title: "With Shadow",            level: 2 },
+  { id: "usage",              title: "Usage Guidelines",       level: 2 },
+  { id: "accessibility",      title: "Accessibility",          level: 2 },
+  { id: "api",                title: "API Reference",          level: 2 },
 ];
 
-const roundedCode = `import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
-<Tabs defaultValue="Overview">
-  <TabsList>
-    <TabsTrigger value="Overview">Overview</TabsTrigger>
-    <TabsTrigger value="Analytics">Analytics</TabsTrigger>
-    <TabsTrigger value="Settings">Settings</TabsTrigger>
-    <TabsTrigger value="Team">Team</TabsTrigger>
-  </TabsList>
-</Tabs>`;
-
-const roundedBrandCode = `<Tabs defaultValue="Overview">
-  <TabsList>
-    {tabs.map((t) => (
-      <TabsTrigger
-        key={t}
-        value={t}
-        className="data-[state=active]:text-[var(--color-primary-700)] dark:data-[state=active]:text-[var(--color-primary-400)]"
-      >
-        {t}
-      </TabsTrigger>
-    ))}
-  </TabsList>
-</Tabs>`;
-
-const lineCode = `import * as TabsPrimitive from "@radix-ui/react-tabs";
-
-<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List
-    className="relative inline-flex items-center gap-[16px] border-b border-[var(--stroke-primary)]"
-  >
-    {tabs.map((t) => (
-      <TabsPrimitive.Trigger
-        key={t}
-        value={t}
-        className="px-[4px] pb-[12px] pt-[8px] text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:text-[var(--color-primary-700)]
-          dark:data-[state=active]:text-[var(--color-primary-400)]"
-      >
-        {t}
-      </TabsPrimitive.Trigger>
-    ))}
-    {/* Animated 2px underline sits beneath the active trigger */}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
-
-const rectangleBrandCode = `<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List className="inline-flex items-center gap-[8px] rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] p-[8px]">
-    {tabs.map((t) => (
-      <TabsPrimitive.Trigger
-        key={t}
-        value={t}
-        className="h-[36px] rounded-[6px] border border-transparent px-[12px] text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:border-[var(--color-primary-600)]
-          data-[state=active]:text-[var(--color-primary-700)]
-          dark:data-[state=active]:text-[var(--color-primary-400)]"
-      >
-        {t}
-      </TabsPrimitive.Trigger>
-    ))}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
-
-const rectangleNeutralCode = `<TabsPrimitive.Root defaultValue="Overview">
-  <TabsPrimitive.List className="inline-flex items-center gap-[8px] rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] p-[8px]">
-    {tabs.map((t) => (
-      <TabsPrimitive.Trigger
-        key={t}
-        value={t}
-        className="h-[36px] rounded-[6px] border border-transparent px-[12px] text-[14px] font-medium text-[var(--text-tertiary)]
-          data-[state=active]:border-[var(--stroke-secondary)]
-          data-[state=active]:bg-[var(--surface-tertiary)]
-          data-[state=active]:text-[var(--header-primary)]"
-      >
-        {t}
-      </TabsPrimitive.Trigger>
-    ))}
-  </TabsPrimitive.List>
-</TabsPrimitive.Root>`;
-
-const shadowCode = `<TabsPrimitive.List
-  className="inline-flex items-center gap-[8px] rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] p-[8px] shadow-[0_1px_3px_0_rgba(16,24,40,0.15)]"
->
-  {/* triggers match Rectangle · Brand */}
-</TabsPrimitive.List>`;
-
+// ─── Code snippets ────────────────────────────────────────────────────────────
 const overviewCode = `import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 <Tabs defaultValue="Overview">
@@ -324,25 +254,126 @@ const overviewCode = `import { Tabs, TabsList, TabsTrigger } from "@/components/
   </TabsList>
 </Tabs>`;
 
+const roundedNeutralCode = `<TabsPrimitive.Root defaultValue="Overview">
+  <TabsPrimitive.List className="inline-flex items-center gap-[12px]">
+    {tabs.map((tab) => (
+      <TabsPrimitive.Trigger
+        key={tab}
+        value={tab}
+        className="rounded-[999px] border border-[var(--color-primary-100)] px-[16px] py-[8px]
+          text-[14px] font-medium text-[var(--text-tertiary)]
+          data-[state=active]:border-[var(--stroke-secondary)]
+          data-[state=active]:text-[var(--header-primary)]"
+      >
+        {tab}
+      </TabsPrimitive.Trigger>
+    ))}
+  </TabsPrimitive.List>
+</TabsPrimitive.Root>`;
+
+const roundedBrandCode = `<TabsPrimitive.Root defaultValue="Overview">
+  <TabsPrimitive.List className="inline-flex items-center gap-[12px]">
+    {tabs.map((tab) => (
+      <TabsPrimitive.Trigger
+        key={tab}
+        value={tab}
+        className="rounded-[999px] border border-[var(--color-primary-100)] px-[16px] py-[8px]
+          text-[14px] font-medium text-[var(--text-tertiary)]
+          data-[state=active]:border-[var(--color-primary-600)]
+          data-[state=active]:text-[var(--color-primary-700)]
+          dark:data-[state=active]:text-[var(--color-primary-400)]"
+      >
+        {tab}
+      </TabsPrimitive.Trigger>
+    ))}
+  </TabsPrimitive.List>
+</TabsPrimitive.Root>`;
+
+const lineCode = `<TabsPrimitive.Root defaultValue="Overview">
+  <TabsPrimitive.List className="relative inline-flex items-center gap-[16px] border-b border-[var(--stroke-primary)]">
+    {tabs.map((tab) => (
+      <TabsPrimitive.Trigger
+        key={tab}
+        value={tab}
+        className="pb-[12px] pt-[8px] px-[4px] text-[14px] font-medium text-[var(--text-tertiary)]
+          data-[state=active]:text-[var(--color-primary-700)]
+          dark:data-[state=active]:text-[var(--color-primary-400)]"
+      >
+        {tab}
+      </TabsPrimitive.Trigger>
+    ))}
+    {/* Animated 2px underline — position with transform + ResizeObserver */}
+  </TabsPrimitive.List>
+</TabsPrimitive.Root>`;
+
+const rectangleBrandCode = `<TabsPrimitive.Root defaultValue="Overview">
+  <TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)]
+    bg-[var(--surface-default)] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
+    {tabs.map((tab) => (
+      <TabsPrimitive.Trigger
+        key={tab}
+        value={tab}
+        className="rounded-[8px] border border-transparent px-[16px] py-[10px]
+          text-[14px] font-medium text-[var(--text-tertiary)]
+          data-[state=active]:border-[var(--color-primary-600)]
+          data-[state=active]:bg-[var(--surface-default)]
+          data-[state=active]:text-[var(--color-primary-700)]
+          dark:data-[state=active]:text-[var(--color-primary-400)]"
+      >
+        {tab}
+      </TabsPrimitive.Trigger>
+    ))}
+  </TabsPrimitive.List>
+</TabsPrimitive.Root>`;
+
+const rectangleNeutralCode = `<TabsPrimitive.Root defaultValue="Overview">
+  <TabsPrimitive.List className="inline-flex items-stretch rounded-[8px] border border-[var(--stroke-primary)]">
+    {tabs.map((tab) => (
+      <TabsPrimitive.Trigger
+        key={tab}
+        value={tab}
+        className="rounded-[8px] border border-transparent px-[10px] py-[8px]
+          text-[14px] font-medium text-[var(--text-tertiary)]
+          data-[state=active]:border-[var(--stroke-secondary)]
+          data-[state=active]:text-[var(--header-primary)]"
+      >
+        {tab}
+      </TabsPrimitive.Trigger>
+    ))}
+  </TabsPrimitive.List>
+</TabsPrimitive.Root>`;
+
+const shadowCode = `<TabsPrimitive.Root defaultValue="Overview">
+  <TabsPrimitive.List className="inline-flex items-center rounded-[8px]
+    bg-[var(--surface-alt-tertiary)] p-[4px] shadow-[0px_1px_3px_0px_rgba(16,24,40,0.15)]">
+    {tabs.map((tab) => (
+      <TabsPrimitive.Trigger
+        key={tab}
+        value={tab}
+        className="rounded-[8px] px-[16px] py-[8px] text-[14px] font-medium text-[var(--text-tertiary)]
+          data-[state=active]:bg-[var(--surface-default)]
+          data-[state=active]:text-[var(--header-primary)]
+          data-[state=active]:shadow-[0px_0px_24px_0px_rgba(28,27,27,0.08)]"
+      >
+        {tab}
+      </TabsPrimitive.Trigger>
+    ))}
+  </TabsPrimitive.List>
+</TabsPrimitive.Root>`;
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 export default function TabsPage() {
-  const [playgroundVariant, setPlaygroundVariant] =
-    useState<VariantKey>("rounded-neutral");
+  const [playgroundVariant, setPlaygroundVariant] = useState<VariantKey>("rounded-neutral");
 
   const playgroundCode = (() => {
     switch (playgroundVariant) {
-      case "line":
-        return lineCode;
-      case "rectangle-brand":
-        return rectangleBrandCode;
-      case "rectangle-neutral":
-        return rectangleNeutralCode;
-      case "shadow":
-        return shadowCode;
-      case "rounded-brand":
-        return roundedBrandCode;
+      case "line":              return lineCode;
+      case "rectangle-brand":   return rectangleBrandCode;
+      case "rectangle-neutral": return rectangleNeutralCode;
+      case "shadow":            return shadowCode;
+      case "rounded-brand":     return roundedBrandCode;
       case "rounded-neutral":
-      default:
-        return roundedCode;
+      default:                  return roundedNeutralCode;
     }
   })();
 
@@ -359,16 +390,24 @@ export default function TabsPage() {
           </p>
         </div>
 
+        {/* Overview */}
         <section id="overview">
           <ComponentPreview
             heading="Overview"
-            description="The default tab renders as a rounded chip inside a subtle tray. The sliding pill signals the active view and animates as the user switches."
+            description="The default tab uses a chip-in-tray style with an animated sliding pill that signals the active view as the user switches."
             code={overviewCode}
           >
-            <ChipTabsDemo />
+            <Tabs defaultValue={DEMO_TABS[0]}>
+              <TabsList>
+                {DEMO_TABS.map((t) => (
+                  <TabsTrigger key={t} value={t}>{t}</TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
           </ComponentPreview>
         </section>
 
+        {/* Playground */}
         <section id="playground">
           <ComponentPreview
             heading="Interactive playground"
@@ -407,61 +446,73 @@ export default function TabsPage() {
           </ComponentPreview>
         </section>
 
-        <section id="rounded">
+        {/* Rounded · Neutral */}
+        <section id="rounded-neutral">
           <ComponentPreview
-            heading="Rounded (chip) tabs"
-            description="The retained chip styling — pill triggers on a neutral tray with an animated sliding indicator. Use for filtering and dense toolbars."
-            code={roundedCode}
+            heading="Rounded · Neutral"
+            description="Standalone pill tabs with a light brand border on each item. The active tab gets a neutral outline — no container tray."
+            code={roundedNeutralCode}
           >
-            <div className="flex w-full flex-col items-center gap-[20px]">
-              <ChipTabsDemo />
-              <ChipTabsDemo activeBrand />
-            </div>
+            <RoundedPillDemo />
           </ComponentPreview>
         </section>
 
+        {/* Rounded · Brand */}
+        <section id="rounded-brand">
+          <ComponentPreview
+            heading="Rounded · Brand"
+            description="Same pill shape, but the active tab is outlined and labelled in the brand colour. Use when you want stronger visual hierarchy."
+            code={roundedBrandCode}
+          >
+            <RoundedPillDemo brand />
+          </ComponentPreview>
+        </section>
+
+        {/* Line */}
         <section id="line">
           <ComponentPreview
             heading="Line (underline)"
-            description="Best for primary page-level navigation. Tabs sit along a bottom border with a 2px brand-coloured underline anchoring the active view."
+            description="Best for primary page-level navigation. Tabs sit along a bottom border with an animated 2px brand underline anchoring the active view."
             code={lineCode}
           >
-            <div className="flex w-full flex-col items-center gap-[20px]">
-              <LineTabsDemo />
-            </div>
+            <LineTabsDemo />
           </ComponentPreview>
         </section>
 
+        {/* Rectangle · Brand */}
         <section id="rectangle-brand">
           <ComponentPreview
             heading="Rectangle · Brand"
-            description="Card-style tabs framed in a bordered tray. The active trigger is marked with a brand-coloured border and text."
+            description="Card-style tabs in a shadowed, bordered tray. The active trigger gets a full brand-coloured border — strong emphasis without a filled background."
             code={rectangleBrandCode}
           >
-            <RectangleTabsDemo tone="brand" />
+            <RectBrandDemo />
           </ComponentPreview>
         </section>
 
+        {/* Rectangle · Neutral */}
         <section id="rectangle-neutral">
           <ComponentPreview
             heading="Rectangle · Neutral"
-            description="Same tray as the brand variant, but the active trigger fills with a neutral tone — ideal when tabs live next to strongly coloured content."
+            description="Same card shape but the active trigger uses a neutral border — ideal when tabs sit next to strongly coloured content or in secondary panels."
             code={rectangleNeutralCode}
           >
-            <RectangleTabsDemo tone="neutral" />
+            <RectNeutralDemo />
           </ComponentPreview>
         </section>
 
+        {/* With Shadow */}
         <section id="shadow">
           <ComponentPreview
-            heading="With shadow"
-            description="Rectangle tabs with a soft elevation shadow. Use when the tab list floats above a canvas or media surface."
+            heading="With Shadow"
+            description="A grey tray where the active tab floats with a white background and a soft elevation shadow. Use for toolbars that float above a canvas or media surface."
             code={shadowCode}
           >
-            <RectangleTabsDemo tone="brand" elevated />
+            <WithShadowDemo />
           </ComponentPreview>
         </section>
 
+        {/* Usage */}
         <section id="usage">
           <h2 className="text-[18px] font-semibold leading-[24px] text-[var(--header-primary)]">
             Usage Guidelines
@@ -469,7 +520,7 @@ export default function TabsPage() {
           <DoDont
             doItems={[
               "Use line tabs for primary, page-level navigation between content sections",
-              "Use rounded (chip) tabs for filtering and secondary segmented controls",
+              "Use rounded pill tabs for filtering and secondary segmented controls",
               "Keep labels short — 1–2 words is ideal, so every tab is visible without truncation",
               "Always show at least two tabs; otherwise use a heading",
               "Preserve tab state when users navigate away and return",
@@ -478,12 +529,13 @@ export default function TabsPage() {
               "Don't use tabs for sequential steps — use a stepper instead",
               "Don't stack more than six tabs in a single row; collapse overflow into a menu",
               "Don't nest tabs within tabs",
-              "Don't mix rectangle and rounded variants inside the same surface",
+              "Don't mix rectangle and rounded variants on the same surface",
               "Don't reorder tabs dynamically between sessions",
             ]}
           />
         </section>
 
+        {/* Accessibility */}
         <section id="accessibility">
           <h2 className="text-[18px] font-semibold leading-[24px] text-[var(--header-primary)]">
             Accessibility
@@ -508,7 +560,7 @@ export default function TabsPage() {
               },
               {
                 title: "Motion",
-                desc: "The sliding indicator (chip and line variants) uses a 250ms transition. It is paused when users prefer reduced motion at the OS level.",
+                desc: "The sliding indicator (line variant) uses a 250ms transition. It is paused when users prefer reduced motion at the OS level.",
               },
             ].map((a) => (
               <div
@@ -526,6 +578,7 @@ export default function TabsPage() {
           </div>
         </section>
 
+        {/* API Reference */}
         <section id="api">
           <h2 className="text-[18px] font-semibold leading-[24px] text-[var(--header-primary)]">
             API Reference
@@ -535,34 +588,11 @@ export default function TabsPage() {
           </h3>
           <PropsTable
             props={[
-              {
-                name: "value",
-                type: "string",
-                description: "Controlled active tab value.",
-              },
-              {
-                name: "defaultValue",
-                type: "string",
-                description: "Initial active tab for uncontrolled usage.",
-              },
-              {
-                name: "onValueChange",
-                type: "(value: string) => void",
-                description: "Fires when the active tab changes.",
-              },
-              {
-                name: "orientation",
-                type: '"horizontal" | "vertical"',
-                default: '"horizontal"',
-                description: "Direction of the tab list.",
-              },
-              {
-                name: "activationMode",
-                type: '"automatic" | "manual"',
-                default: '"automatic"',
-                description:
-                  "Whether tabs activate on focus or require Enter / Space.",
-              },
+              { name: "value",           type: "string",                          description: "Controlled active tab value." },
+              { name: "defaultValue",    type: "string",                          description: "Initial active tab for uncontrolled usage." },
+              { name: "onValueChange",   type: "(value: string) => void",         description: "Fires when the active tab changes." },
+              { name: "orientation",     type: '"horizontal" | "vertical"',       default: '"horizontal"', description: "Direction of the tab list." },
+              { name: "activationMode", type: '"automatic" | "manual"',          default: '"automatic"',  description: "Whether tabs activate on focus or require Enter / Space." },
             ]}
           />
           <h3 className="mt-5 text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">
@@ -570,18 +600,8 @@ export default function TabsPage() {
           </h3>
           <PropsTable
             props={[
-              {
-                name: "children",
-                type: "ReactNode",
-                required: true,
-                description: "One or more <TabsTrigger> elements.",
-              },
-              {
-                name: "className",
-                type: "string",
-                description:
-                  "Extra classes merged onto the list container — override surface, padding, or gap here.",
-              },
+              { name: "children",  type: "ReactNode", required: true, description: "One or more <TabsTrigger> elements." },
+              { name: "className", type: "string",                    description: "Extra classes merged onto the list container — override surface, padding, or gap here." },
             ]}
           />
           <h3 className="mt-5 text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">
@@ -589,24 +609,9 @@ export default function TabsPage() {
           </h3>
           <PropsTable
             props={[
-              {
-                name: "value",
-                type: "string",
-                required: true,
-                description: "Unique identifier matched against the active value.",
-              },
-              {
-                name: "disabled",
-                type: "boolean",
-                default: "false",
-                description: "Prevents interaction and dims the trigger.",
-              },
-              {
-                name: "className",
-                type: "string",
-                description:
-                  "Override active-state colours, padding, or typography per-trigger.",
-              },
+              { name: "value",     type: "string",  required: true, description: "Unique identifier matched against the active value." },
+              { name: "disabled",  type: "boolean", default: "false", description: "Prevents interaction and dims the trigger." },
+              { name: "className", type: "string",                    description: "Override active-state colours, padding, or typography per-trigger." },
             ]}
           />
         </section>
