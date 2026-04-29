@@ -50,9 +50,10 @@ export function DoDont({
   dontTitle,
 }: DoDontProps) {
   return (
-    <div className="mb-[24px] grid gap-[24px] md:grid-cols-2">
-      <div className="relative overflow-hidden rounded-[12px] bg-[rgba(0,162,81,0.09)] p-[20px]">
-        <div className="flex h-[256px] items-center justify-center overflow-hidden rounded-[8px] bg-white p-[24px] dark:bg-[var(--surface-primary)]">
+    <div className="mt-[12px] grid gap-[24px] md:grid-cols-2">
+      {/* Do box — flex-col so inner white box fills remaining height */}
+      <div className="flex flex-col overflow-hidden rounded-[12px] bg-[rgba(0,162,81,0.09)] p-[20px]">
+        <div className="flex flex-1 flex-col overflow-hidden rounded-[8px] bg-white p-[24px] dark:bg-[var(--surface-primary)]">
           {doContent ?? (
             <ul className="flex flex-col gap-[12px]">
               {doItems?.map((item, i) => (
@@ -67,7 +68,7 @@ export function DoDont({
           )}
         </div>
         <div className="mt-[16px] flex items-center gap-[10px]">
-          <CheckIcon className="h-[20px] w-[20px] text-[#00a251]" />
+          <CheckIcon className="h-[20px] w-[20px] shrink-0 text-[#00a251]" />
           <span className="text-[18px] font-semibold leading-[24px] text-[#00a251]">
             Do
           </span>
@@ -78,8 +79,9 @@ export function DoDont({
           </h3>
         )}
       </div>
-      <div className="relative overflow-hidden rounded-[12px] bg-[rgba(217,45,32,0.10)] p-[20px]">
-        <div className="flex h-[256px] items-center justify-center overflow-hidden rounded-[8px] bg-white p-[24px] dark:bg-[var(--surface-primary)]">
+      {/* Don't box */}
+      <div className="flex flex-col overflow-hidden rounded-[12px] bg-[rgba(217,45,32,0.10)] p-[20px]">
+        <div className="flex flex-1 flex-col overflow-hidden rounded-[8px] bg-white p-[24px] dark:bg-[var(--surface-primary)]">
           {dontContent ?? (
             <ul className="flex flex-col gap-[12px]">
               {dontItems?.map((item, i) => (
@@ -94,7 +96,7 @@ export function DoDont({
           )}
         </div>
         <div className="mt-[16px] flex items-center gap-[10px]">
-          <CloseIcon className="h-[20px] w-[20px] text-[#d92d20]" />
+          <CloseIcon className="h-[20px] w-[20px] shrink-0 text-[#d92d20]" />
           <span className="text-[18px] font-semibold leading-[24px] text-[#d92d20]">
             Don&apos;t
           </span>
