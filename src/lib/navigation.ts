@@ -47,19 +47,19 @@ export const navigation: NavGroup[] = [
       { title: "All Components", href: "/docs/components" },
       {
         title: "Avatar", href: "/docs/components/avatar",
-        componentCard: { componentCount: 3, variantCount: 11, image: "/Images/Thumbnails/base_components/Avatar.png" },
+        componentCard: { componentCount: 1, variantCount: 6, image: "/Images/Thumbnails/base_components/Avatar.png" },
       },
       {
         title: "Badge", href: "/docs/components/badge",
-        componentCard: { componentCount: 1, variantCount: 25 },
+        componentCard: { componentCount: 1, variantCount: 6 },
       },
       {
         title: "Breadcrumbs", href: "/docs/components/breadcrumb",
-        componentCard: { componentCount: 1, variantCount: 6, image: "/Images/Thumbnails/base_components/Breadcrumbs.png" },
+        componentCard: { componentCount: 1, variantCount: 2, image: "/Images/Thumbnails/base_components/Breadcrumbs.png" },
       },
       {
         title: "Button", href: "/docs/components/button",
-        componentCard: { componentCount: 1, variantCount: 13, image: "/Images/Thumbnails/base_components/Button.png" },
+        componentCard: { componentCount: 1, variantCount: 6, image: "/Images/Thumbnails/base_components/Button.png" },
       },
       {
         title: "Card", href: "/docs/components/card",
@@ -67,7 +67,7 @@ export const navigation: NavGroup[] = [
       },
       {
         title: "Date & Time Picker", href: "/docs/components/date-time-picker",
-        componentCard: { componentCount: 1, variantCount: 2, image: "/Images/Thumbnails/base_components/Date Picker.png" },
+        componentCard: { componentCount: 1, variantCount: 4, image: "/Images/Thumbnails/base_components/Date Picker.png" },
       },
       {
         title: "Dropdown", href: "/docs/components/dropdown",
@@ -75,15 +75,15 @@ export const navigation: NavGroup[] = [
       },
       {
         title: "File Uploader", href: "/docs/components/file-uploader",
-        componentCard: { componentCount: 1, variantCount: 1, image: "/Images/Thumbnails/base_components/File Uploader.png" },
+        componentCard: { componentCount: 1, variantCount: 4, image: "/Images/Thumbnails/base_components/File Uploader.png" },
       },
       {
         title: "Input", href: "/docs/components/input",
-        componentCard: { componentCount: 1, variantCount: 10, image: "/Images/Thumbnails/base_components/Input.png" },
+        componentCard: { componentCount: 1, variantCount: 5, image: "/Images/Thumbnails/base_components/Input.png" },
       },
       {
         title: "Number Inputs", href: "/docs/components/number-inputs",
-        componentCard: { componentCount: 1, variantCount: 4, image: "/Images/Thumbnails/base_components/Number Inputs.png" },
+        componentCard: { componentCount: 1, variantCount: 3, image: "/Images/Thumbnails/base_components/Number Inputs.png" },
       },
       {
         title: "Pagination", href: "/docs/components/pagination",
@@ -95,11 +95,11 @@ export const navigation: NavGroup[] = [
       },
       {
         title: "Selectors", href: "/docs/components/selectors",
-        componentCard: { componentCount: 3, variantCount: 6, image: "/Images/Thumbnails/base_components/Selectors.png" },
+        componentCard: { componentCount: 2, variantCount: 6, image: "/Images/Thumbnails/base_components/Selectors.png" },
       },
       {
         title: "Sliders", href: "/docs/components/slider",
-        componentCard: { componentCount: 1, variantCount: 2, image: "/Images/Thumbnails/base_components/Sliders.png" },
+        componentCard: { componentCount: 1, variantCount: 4, image: "/Images/Thumbnails/base_components/Sliders.png" },
       },
       {
         title: "Steppers", href: "/docs/components/stepper",
@@ -107,23 +107,23 @@ export const navigation: NavGroup[] = [
       },
       {
         title: "Table", href: "/docs/components/table",
-        componentCard: { componentCount: 1, variantCount: 7, image: "/Images/Thumbnails/base_components/Table.png" },
+        componentCard: { componentCount: 1, variantCount: 5, image: "/Images/Thumbnails/base_components/Table.png" },
       },
       {
         title: "Tabs", href: "/docs/components/tabs",
-        componentCard: { componentCount: 1, variantCount: 5, image: "/Images/Thumbnails/base_components/Tab.png" },
+        componentCard: { componentCount: 1, variantCount: 6, image: "/Images/Thumbnails/base_components/Tab.png" },
       },
       {
         title: "Tags", href: "/docs/components/tags",
-        componentCard: { componentCount: 1, variantCount: 4, image: "/Images/Thumbnails/base_components/Tags.png" },
+        componentCard: { componentCount: 1, variantCount: 2, image: "/Images/Thumbnails/base_components/Tags.png" },
       },
       {
         title: "Text Area", href: "/docs/components/textarea",
-        componentCard: { componentCount: 1, variantCount: 3, image: "/Images/Thumbnails/base_components/Text Area.png" },
+        componentCard: { componentCount: 1, variantCount: 2, image: "/Images/Thumbnails/base_components/Text Area.png" },
       },
       {
         title: "Toast", href: "/docs/components/toast",
-        componentCard: { componentCount: 1, variantCount: 4, image: "/Images/Thumbnails/base_components/Toasters.png" },
+        componentCard: { componentCount: 1, variantCount: 5, image: "/Images/Thumbnails/base_components/Toasters.png" },
       },
       {
         title: "Toggles", href: "/docs/components/toggle",
