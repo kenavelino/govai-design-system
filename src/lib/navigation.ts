@@ -63,7 +63,7 @@ export const navigation: NavGroup[] = [
       },
       {
         title: "Card", href: "/docs/components/card",
-        componentCard: { componentCount: 1, variantCount: 6 },
+        componentCard: { componentCount: 1, variantCount: 2 },
       },
       {
         title: "Date & Time Picker", href: "/docs/components/date-time-picker",
