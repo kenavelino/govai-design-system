@@ -12,7 +12,8 @@ import { SearchDialog } from "@/components/docs/search-dialog";
 
 type Crumb = { title: string; href: string; current?: boolean };
 
-function getBreadcrumbs(pathname: string): Crumb[] | null {
+function getBreadcrumbs(rawPathname: string): Crumb[] | null {
+  const pathname = rawPathname.replace(/\/$/, "") || "/";
   for (const group of navigation) {
     const item = group.items.find((i) => i.href === pathname);
     if (item) {
