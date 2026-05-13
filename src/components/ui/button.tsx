@@ -14,7 +14,7 @@ const buttonVariants = cva(
         primary:
           "bg-[var(--color-primary-600)] text-[var(--color-neutral-0)] hover:bg-[var(--color-primary-700)] active:bg-[var(--color-primary-600)] disabled:bg-[var(--surface-disabled)] disabled:text-[var(--text-alt-tertiary)] dark:hover:bg-[var(--color-primary-500)]",
         secondary:
-          "border border-[var(--stroke-primary)] bg-[var(--surface-default)] text-[var(--text-primary)] hover:bg-[var(--surface-alt-tertiary)] active:bg-[var(--surface-alt-tertiary)] disabled:border-[var(--stroke-primary)] disabled:text-[var(--text-alt-tertiary)] disabled:bg-transparent",
+          "border border-[var(--stroke-primary)] bg-[var(--surface-default)] text-[var(--text-primary)] hover:bg-[var(--surface-alt-tertiary)] hover:border-[var(--stroke-secondary)] active:bg-[var(--surface-alt-tertiary)] disabled:border-[var(--stroke-primary)] disabled:text-[var(--text-alt-tertiary)] disabled:bg-transparent",
         tertiary:
           "text-[var(--color-primary-700)] hover:bg-[var(--surface-tertiary)] active:bg-[var(--surface-alt-tertiary)] disabled:text-[var(--text-alt-tertiary)] dark:text-[var(--color-primary-500)]",
         ghost:
