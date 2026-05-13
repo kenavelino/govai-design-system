@@ -3,6 +3,7 @@
 import { OnThisPage } from "@/components/docs/on-this-page";
 import { CodeBlock } from "@/components/docs/code-block";
 import { DataTable } from "@/components/ui/data-table";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import type { ColumnDef } from "@/components/ui/data-table";
 
 const tocItems = [
@@ -15,6 +16,9 @@ const tocItems = [
   { id: "components",    title: "Using Components",          level: 2 },
   { id: "links",         title: "Project Links",             level: 2 },
 ];
+
+const quickInstallProject = `claude mcp add govai-design-system npx -y govai-mcp`;
+const quickInstallGlobal  = `claude mcp add --scope global govai-design-system npx -y govai-mcp`;
 
 const mcpJsonCode = `{
   "mcpServers": {
@@ -143,13 +147,39 @@ export default function DevelopersPage() {
             This is the recommended integration. The MCP server connects Claude directly to the live design system — no copy-pasting, and it auto-updates every time the design system changes.
           </p>
 
+          {/* Quick Install */}
+          <div className="mt-5 rounded-[12px] border border-[var(--stroke-primary)] p-[20px]">
+            <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">Quick Install</p>
+            <p className="mt-1 text-[14px] leading-[20px] text-[var(--text-secondary)]">
+              Run this command in your terminal, or paste it into any Claude chat window.
+            </p>
+            <Tabs defaultValue="project" className="mt-[12px]">
+              <TabsList>
+                <TabsTrigger value="project">This project</TabsTrigger>
+                <TabsTrigger value="global">Global — all projects</TabsTrigger>
+              </TabsList>
+              <TabsContent value="project">
+                <CodeBlock code={quickInstallProject} language="bash" />
+                <p className="mt-[8px] text-[13px] leading-[18px] text-[var(--text-tertiary)]">
+                  Adds the MCP server to this project only. Creates or updates <code className="text-[12px]">.mcp.json</code> in the current directory.
+                </p>
+              </TabsContent>
+              <TabsContent value="global">
+                <CodeBlock code={quickInstallGlobal} language="bash" />
+                <p className="mt-[8px] text-[13px] leading-[18px] text-[var(--text-tertiary)]">
+                  Installs once, works everywhere. No <code className="text-[12px]">.mcp.json</code> needed in individual projects.
+                </p>
+              </TabsContent>
+            </Tabs>
+          </div>
+
           <div className="mt-5 flex flex-col gap-[20px]">
             <div>
               <p className="text-[14px] font-semibold leading-[20px] text-[var(--header-primary)]">
-                Step 1 — Create <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px] font-normal">.mcp.json</code> in your project root
+                Manual setup — create <code className="rounded bg-[var(--surface-alt-tertiary)] px-[6px] py-[2px] text-[13px] font-normal">.mcp.json</code> in your project root
               </p>
               <p className="mt-1 text-[14px] leading-[20px] text-[var(--text-tertiary)]">
-                If your project already has a <code className="text-[13px]">.mcp.json</code>, add the <code className="text-[13px]">"govai-design-system"</code> block inside the existing <code className="text-[13px]">"mcpServers"</code> section.
+                If your project already has a <code className="text-[13px]">.mcp.json</code>, add the <code className="text-[13px]">&quot;govai-design-system&quot;</code> block inside the existing <code className="text-[13px]">&quot;mcpServers&quot;</code> section.
               </p>
               <CodeBlock code={mcpJsonCode} language="json" className="mt-3" />
             </div>
