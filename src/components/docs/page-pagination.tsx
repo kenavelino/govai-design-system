@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/ui/icon";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navigation } from "@/lib/navigation";
@@ -40,27 +41,23 @@ export function PagePagination() {
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-[var(--stroke-primary)] [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)] [-webkit-mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
       />
       {prev ? (
-        <Link
-          href={prev.href}
-          className="group inline-flex h-[40px] items-center gap-[8px] rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] px-[16px] text-[14px] font-medium leading-[20px] text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-alt-tertiary)]"
-        >
-          <Icon name="arrow-left" className="h-[16px] w-[16px] text-[var(--text-tertiary)] transition-colors group-hover:text-[var(--text-primary)]"
-            aria-hidden="true" />
-          <span>{prev.title}</span>
-        </Link>
+        <Button asChild variant="secondary" size="lg" className="group">
+          <Link href={prev.href}>
+            <Icon name="arrow-left" className="h-[16px] w-[16px] text-[var(--text-tertiary)] transition-colors group-hover:text-[var(--text-primary)]" aria-hidden="true" />
+            <span>{prev.title}</span>
+          </Link>
+        </Button>
       ) : (
         <span aria-hidden="true" />
       )}
 
       {next ? (
-        <Link
-          href={next.href}
-          className="group ml-auto inline-flex h-[40px] items-center gap-[8px] rounded-[8px] border border-[var(--stroke-primary)] bg-[var(--surface-default)] px-[16px] text-[14px] font-medium leading-[20px] text-[var(--text-primary)] transition-colors hover:bg-[var(--surface-alt-tertiary)]"
-        >
-          <span>{next.title}</span>
-          <Icon name="arrow-right" className="h-[16px] w-[16px] text-[var(--text-tertiary)] transition-colors group-hover:text-[var(--text-primary)]"
-            aria-hidden="true" />
-        </Link>
+        <Button asChild variant="secondary" size="lg" className="group ml-auto">
+          <Link href={next.href}>
+            <span>{next.title}</span>
+            <Icon name="arrow-right" className="h-[16px] w-[16px] text-[var(--text-tertiary)] transition-colors group-hover:text-[var(--text-primary)]" aria-hidden="true" />
+          </Link>
+        </Button>
       ) : (
         <span aria-hidden="true" />
       )}
