@@ -135,4 +135,11 @@ export const navigation: NavGroup[] = [
       },
     ],
   },
+  {
+    label: "Main Components",
+    items: [
+      { title: "Input Area", href: "/docs/main-components/input-area" },
+      { title: "Input Chat", href: "/docs/main-components/input-chat" },
+    ],
+  },
 ];
